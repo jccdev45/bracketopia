@@ -1,4 +1,5 @@
 import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
+import { NotFound } from "@/components/not-found";
 import { Header } from "@/components/shared/header";
 import { Toaster } from "@/components/ui/sonner";
 import { seo } from "@/utils/seo";
@@ -56,6 +57,7 @@ export const Route = createRootRoute({
 			</RootDocument>
 		);
 	},
+	notFoundComponent: () => <NotFound />,
 	component: () => (
 		<RootDocument>
 			<TanstackQueryProvider>
