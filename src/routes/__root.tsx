@@ -1,6 +1,6 @@
-import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
-import { NotFound } from "@/components/not-found";
+import { DefaultCatchBoundary } from "@/components/shared/default-catch-boundary";
 import { Header } from "@/components/shared/header";
+import { NotFound } from "@/components/shared/not-found";
 import { Toaster } from "@/components/ui/sonner";
 import { seo } from "@/utils/seo";
 import { fetchUser } from "@/utils/user";
