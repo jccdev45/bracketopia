@@ -1,6 +1,8 @@
 import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
+import { Header } from "@/components/shared/header";
 import { Toaster } from "@/components/ui/sonner";
 import { seo } from "@/utils/seo";
+import { fetchUser } from "@/utils/user";
 import {
 	HeadContent,
 	Outlet,
@@ -8,7 +10,6 @@ import {
 	createRootRoute,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import Header from "../components/Header";
 import TanstackQueryLayout from "../integrations/tanstack-query/layout";
 import TanstackQueryProvider from "../integrations/tanstack-query/provider";
 import appCss from "../styles.css?url";
@@ -40,6 +41,14 @@ export const Route = createRootRoute({
 			{ rel: "icon", href: "/favicon.ico" },
 		],
 	}),
+	beforeLoad: async () => {
+		const user = await fetchUser();
+		console.log("🚀 ~ beforeLoad: ~ user:", user);
+
+		return {
+			user,
+		};
+	},
 	errorComponent: (props) => {
 		return (
 			<RootDocument>
@@ -64,7 +73,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en-US">
+		<html lang="en">
 			<head>
 				<HeadContent />
 			</head>

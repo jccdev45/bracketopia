@@ -11,13 +11,45 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as RegisterImport } from './routes/register'
+import { Route as LogoutImport } from './routes/logout'
+import { Route as LoginImport } from './routes/login'
+import { Route as AuthedImport } from './routes/_authed'
 import { Route as IndexImport } from './routes/index'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
+import { Route as AuthedMyTournamentsImport } from './routes/_authed/my-tournaments'
+import { Route as AuthedTournamentsIndexImport } from './routes/_authed/tournaments.index'
+import { Route as AuthedProfileIndexImport } from './routes/_authed/profile.index'
 import { Route as DemoStartServerFuncsImport } from './routes/demo.start.server-funcs'
 import { Route as DemoFormSimpleImport } from './routes/demo.form.simple'
 import { Route as DemoFormAddressImport } from './routes/demo.form.address'
+import { Route as AuthedTournamentsIdImport } from './routes/_authed/tournaments.$id'
+import { Route as AuthedTournamentsCreateIndexImport } from './routes/_authed/tournaments.create.index'
 
 // Create/Update Routes
+
+const RegisterRoute = RegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LogoutRoute = LogoutImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedRoute = AuthedImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -29,6 +61,24 @@ const DemoTanstackQueryRoute = DemoTanstackQueryImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedMyTournamentsRoute = AuthedMyTournamentsImport.update({
+  id: '/my-tournaments',
+  path: '/my-tournaments',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedTournamentsIndexRoute = AuthedTournamentsIndexImport.update({
+  id: '/tournaments/',
+  path: '/tournaments/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedProfileIndexRoute = AuthedProfileIndexImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => AuthedRoute,
 } as any)
 
 const DemoStartServerFuncsRoute = DemoStartServerFuncsImport.update({
@@ -49,6 +99,19 @@ const DemoFormAddressRoute = DemoFormAddressImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AuthedTournamentsIdRoute = AuthedTournamentsIdImport.update({
+  id: '/tournaments/$id',
+  path: '/tournaments/$id',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedTournamentsCreateIndexRoute =
+  AuthedTournamentsCreateIndexImport.update({
+    id: '/tournaments/create/',
+    path: '/tournaments/create/',
+    getParentRoute: () => AuthedRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -60,12 +123,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterImport
+      parentRoute: typeof rootRoute
+    }
+    '/_authed/my-tournaments': {
+      id: '/_authed/my-tournaments'
+      path: '/my-tournaments'
+      fullPath: '/my-tournaments'
+      preLoaderRoute: typeof AuthedMyTournamentsImport
+      parentRoute: typeof AuthedImport
+    }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
       path: '/demo/tanstack-query'
       fullPath: '/demo/tanstack-query'
       preLoaderRoute: typeof DemoTanstackQueryImport
       parentRoute: typeof rootRoute
+    }
+    '/_authed/tournaments/$id': {
+      id: '/_authed/tournaments/$id'
+      path: '/tournaments/$id'
+      fullPath: '/tournaments/$id'
+      preLoaderRoute: typeof AuthedTournamentsIdImport
+      parentRoute: typeof AuthedImport
     }
     '/demo/form/address': {
       id: '/demo/form/address'
@@ -88,63 +193,161 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartServerFuncsImport
       parentRoute: typeof rootRoute
     }
+    '/_authed/profile/': {
+      id: '/_authed/profile/'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthedProfileIndexImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/tournaments/': {
+      id: '/_authed/tournaments/'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof AuthedTournamentsIndexImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/tournaments/create/': {
+      id: '/_authed/tournaments/create/'
+      path: '/tournaments/create'
+      fullPath: '/tournaments/create'
+      preLoaderRoute: typeof AuthedTournamentsCreateIndexImport
+      parentRoute: typeof AuthedImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AuthedRouteChildren {
+  AuthedMyTournamentsRoute: typeof AuthedMyTournamentsRoute
+  AuthedTournamentsIdRoute: typeof AuthedTournamentsIdRoute
+  AuthedProfileIndexRoute: typeof AuthedProfileIndexRoute
+  AuthedTournamentsIndexRoute: typeof AuthedTournamentsIndexRoute
+  AuthedTournamentsCreateIndexRoute: typeof AuthedTournamentsCreateIndexRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedMyTournamentsRoute: AuthedMyTournamentsRoute,
+  AuthedTournamentsIdRoute: AuthedTournamentsIdRoute,
+  AuthedProfileIndexRoute: AuthedProfileIndexRoute,
+  AuthedTournamentsIndexRoute: AuthedTournamentsIndexRoute,
+  AuthedTournamentsCreateIndexRoute: AuthedTournamentsCreateIndexRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/register': typeof RegisterRoute
+  '/my-tournaments': typeof AuthedMyTournamentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/tournaments/$id': typeof AuthedTournamentsIdRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/profile': typeof AuthedProfileIndexRoute
+  '/tournaments': typeof AuthedTournamentsIndexRoute
+  '/tournaments/create': typeof AuthedTournamentsCreateIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/register': typeof RegisterRoute
+  '/my-tournaments': typeof AuthedMyTournamentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/tournaments/$id': typeof AuthedTournamentsIdRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/profile': typeof AuthedProfileIndexRoute
+  '/tournaments': typeof AuthedTournamentsIndexRoute
+  '/tournaments/create': typeof AuthedTournamentsCreateIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/register': typeof RegisterRoute
+  '/_authed/my-tournaments': typeof AuthedMyTournamentsRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/_authed/tournaments/$id': typeof AuthedTournamentsIdRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/_authed/profile/': typeof AuthedProfileIndexRoute
+  '/_authed/tournaments/': typeof AuthedTournamentsIndexRoute
+  '/_authed/tournaments/create/': typeof AuthedTournamentsCreateIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | ''
+    | '/login'
+    | '/logout'
+    | '/register'
+    | '/my-tournaments'
     | '/demo/tanstack-query'
+    | '/tournaments/$id'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/server-funcs'
+    | '/profile'
+    | '/tournaments'
+    | '/tournaments/create'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | ''
+    | '/login'
+    | '/logout'
+    | '/register'
+    | '/my-tournaments'
     | '/demo/tanstack-query'
+    | '/tournaments/$id'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/server-funcs'
+    | '/profile'
+    | '/tournaments'
+    | '/tournaments/create'
   id:
     | '__root__'
     | '/'
+    | '/_authed'
+    | '/login'
+    | '/logout'
+    | '/register'
+    | '/_authed/my-tournaments'
     | '/demo/tanstack-query'
+    | '/_authed/tournaments/$id'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/server-funcs'
+    | '/_authed/profile/'
+    | '/_authed/tournaments/'
+    | '/_authed/tournaments/create/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
+  RegisterRoute: typeof RegisterRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
@@ -153,6 +356,10 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  LogoutRoute: LogoutRoute,
+  RegisterRoute: RegisterRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
@@ -170,6 +377,10 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_authed",
+        "/login",
+        "/logout",
+        "/register",
         "/demo/tanstack-query",
         "/demo/form/address",
         "/demo/form/simple",
@@ -179,8 +390,35 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
+    "/_authed": {
+      "filePath": "_authed.tsx",
+      "children": [
+        "/_authed/my-tournaments",
+        "/_authed/tournaments/$id",
+        "/_authed/profile/",
+        "/_authed/tournaments/",
+        "/_authed/tournaments/create/"
+      ]
+    },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/logout": {
+      "filePath": "logout.tsx"
+    },
+    "/register": {
+      "filePath": "register.tsx"
+    },
+    "/_authed/my-tournaments": {
+      "filePath": "_authed/my-tournaments.tsx",
+      "parent": "/_authed"
+    },
     "/demo/tanstack-query": {
       "filePath": "demo.tanstack-query.tsx"
+    },
+    "/_authed/tournaments/$id": {
+      "filePath": "_authed/tournaments.$id.tsx",
+      "parent": "/_authed"
     },
     "/demo/form/address": {
       "filePath": "demo.form.address.tsx"
@@ -190,6 +428,18 @@ export const routeTree = rootRoute
     },
     "/demo/start/server-funcs": {
       "filePath": "demo.start.server-funcs.tsx"
+    },
+    "/_authed/profile/": {
+      "filePath": "_authed/profile.index.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/tournaments/": {
+      "filePath": "_authed/tournaments.index.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/tournaments/create/": {
+      "filePath": "_authed/tournaments.create.index.tsx",
+      "parent": "/_authed"
     }
   }
 }
