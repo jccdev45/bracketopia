@@ -16,6 +16,7 @@ export const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
 export const loginFn = createServerFn()
 	.validator((d: { email: string; password: string }) => d)
 	.handler(async ({ data }) => {
+		console.log("🚀 ~ .handler ~ data:", data);
 		const supabase = await getSupabaseServerClient();
 		const { error } = await supabase.auth.signInWithPassword({
 			email: data.email,

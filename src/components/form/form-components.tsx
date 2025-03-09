@@ -1,17 +1,25 @@
-import { useStore } from "@tanstack/react-form";
-import { useFieldContext, useFormContext } from "../hooks/demo.form-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { type Updater, useStore } from "@tanstack/react-form";
+import type { VariantProps } from "class-variance-authority";
+import { useFieldContext, useFormContext } from "../../context/form-context";
 
-export function SubscribeButton({ label }: { label: string }) {
+export function SubscribeButton({
+	label,
+}: React.ComponentProps<"button"> &
+	VariantProps<typeof Button> & { label: string }) {
 	const form = useFormContext();
 	return (
 		<form.Subscribe selector={(state) => state.isSubmitting}>
 			{(isSubmitting) => (
-				<button
+				<Button
 					disabled={isSubmitting}
-					className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+					// previous style: className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
 				>
 					{label}
-				</button>
+				</Button>
 			)}
 		</form.Subscribe>
 	);
@@ -27,7 +35,7 @@ function ErrorMessages({
 			{errors.map((error) => (
 				<div
 					key={typeof error === "string" ? error : error.message}
-					className="text-red-500 mt-1 font-bold"
+					className="text-destructive mt-1 font-bold"
 				>
 					{typeof error === "string" ? error : error.message}
 				</div>
@@ -39,25 +47,25 @@ function ErrorMessages({
 export function TextField({
 	label,
 	placeholder,
-}: {
-	label: string;
-	placeholder?: string;
-}) {
+	type,
+}: React.ComponentProps<"input"> & { label: string }) {
 	const field = useFieldContext<string>();
 	const errors = useStore(field.store, (state) => state.meta.errors);
 
 	return (
 		<div>
-			<label htmlFor={label} className="block font-bold mb-1 text-xl">
+			{/* previous label style: className="block font-bold mb-1 text-xl" */}
+			<Label htmlFor={label}>
 				{label}
-				<input
+				<Input
 					value={field.state.value}
 					placeholder={placeholder}
 					onBlur={field.handleBlur}
+					type={type}
 					onChange={(e) => field.handleChange(e.target.value)}
-					className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+					// previous style: className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
 				/>
-			</label>
+			</Label>
 			{field.state.meta.isTouched && <ErrorMessages errors={errors} />}
 		</div>
 	);
@@ -66,34 +74,34 @@ export function TextField({
 export function TextArea({
 	label,
 	rows = 3,
-}: {
+}: React.ComponentProps<"textarea"> & {
 	label: string;
-	rows?: number;
 }) {
 	const field = useFieldContext<string>();
 	const errors = useStore(field.store, (state) => state.meta.errors);
 
 	return (
 		<div>
-			<label htmlFor={label} className="block font-bold mb-1 text-xl">
+			{/* previous label style: className="block font-bold mb-1 text-xl" */}
+			<Label htmlFor={label}>
 				{label}
-				<textarea
+				<Textarea
 					value={field.state.value}
 					onBlur={field.handleBlur}
 					rows={rows}
 					onChange={(e) => field.handleChange(e.target.value)}
-					className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+					// previous style: className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
 				/>
-			</label>
+			</Label>
 			{field.state.meta.isTouched && <ErrorMessages errors={errors} />}
 		</div>
 	);
 }
 
-export function Select({
+export function SelectField({
 	label,
 	children,
-}: {
+}: React.ComponentProps<"select"> & {
 	label: string;
 	children: React.ReactNode;
 }) {
@@ -102,14 +110,15 @@ export function Select({
 
 	return (
 		<div>
-			<label htmlFor={label} className="block font-bold mb-1 text-xl">
-				{label}
-			</label>
+			{/* previous label style: className="block font-bold mb-1 text-xl" */}
+			<Label htmlFor={label}>{label}</Label>
 			<select
 				name={field.name}
 				value={field.state.value}
 				onBlur={field.handleBlur}
-				onChange={(e) => field.handleChange(e.target.value)}
+				onChange={(e: { target: { value: Updater<string> } }) =>
+					field.handleChange(e.target.value)
+				}
 				className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
 			>
 				{children}
