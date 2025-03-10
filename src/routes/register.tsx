@@ -8,42 +8,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/use-app-form";
-import { type SignupSchemaValues, signupSchema } from "@/schema/auth";
+import { signupSchema } from "@/schema/auth";
 import { handleForm } from "@/utils/form";
 import { signUpFormOpts } from "@/utils/form-options";
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
-
-import { getSupabaseServerClient } from "@/integrations/supabase/server";
 import { signupFn } from "@/utils/user";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-
-// export const signupFn = createServerFn()
-//   .validator((data: SignupSchemaValues & { redirectUrl?: string }) => data)
-//   .handler(async ({ data }) => {
-//     const supabase = await getSupabaseServerClient();
-//     const { error } = await supabase.auth.signUp({
-//       email: data.email,
-//       password: data.password,
-//       options: {
-//         data: {
-//           username: data.username,
-//         },
-//       },
-//     });
-//     if (error) {
-//       return {
-//         error: true,
-//         message: error.message,
-//       };
-//     }
-
-//     throw redirect({
-//       href: data.redirectUrl || "/",
-//     });
-//   });
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/register")({
   component: RouteComponent,
@@ -56,7 +28,7 @@ function RouteComponent() {
     onSuccess: async (ctx) => {
       if (!ctx?.error) {
         await router.invalidate();
-
+        router.navigate({ to: "/" });
         toast.success("Signup successful! Please login.");
       } else {
         toast.error(ctx?.message || "Signup failed.");

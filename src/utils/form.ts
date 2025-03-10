@@ -26,6 +26,9 @@ export const handleForm = createServerFn({
     }
     return data;
   })
+  // NOTE: this whole function is direct from https://github.com/TanStack/form/blob/fed72edb6c780f06e013d5d617a505eb4649be79/examples/react/tanstack-start/app/utils/form.tsx#L19
+  // idk why handler errors, I'm probably fucking something up somewhere
+  // @ts-expect-error
   .handler(async (ctx) => {
     try {
       await serverValidate(ctx.data);

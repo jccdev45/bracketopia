@@ -8,35 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/use-app-form";
-import { type LoginSchemaValues, loginSchema } from "@/schema/auth";
+import { loginSchema } from "@/schema/auth";
 import { getFormDataFromServer, handleForm } from "@/utils/form";
 import { loginFormOpts } from "@/utils/form-options";
+import { loginFn } from "@/utils/user";
 import { mergeForm, useTransform } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
-
-import { getSupabaseServerClient } from "@/integrations/supabase/server";
-import { loginFn } from "@/utils/user";
 import { Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-
-// const loginFn = createServerFn()
-//   .validator((data: LoginSchemaValues) => data)
-//   .handler(async ({ data }) => {
-//     const supabase = await getSupabaseServerClient();
-//     const { error } = await supabase.auth.signInWithPassword({
-//       email: data.email,
-//       password: data.password,
-//     });
-
-//     if (error) {
-//       return {
-//         error: true,
-//         message: error.message,
-//       };
-//     }
-//   });
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
@@ -52,7 +32,7 @@ function RouteComponent() {
   const loginMutation = useMutation({
     mutationFn: loginFn,
     onSuccess: async (ctx) => {
-      if (ctx?.error) {
+      if (!ctx?.error) {
         await router.invalidate();
         router.navigate({ to: "/" });
         return;

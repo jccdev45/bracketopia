@@ -2,7 +2,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { createServerClient } from "@supabase/ssr";
 import { parseCookies, setCookie } from "@tanstack/react-start/server";
 
-export function getSupabaseServerClient() {
+export function createClient() {
   return createServerClient<Database>(
     // biome-ignore lint/style/noNonNullAssertion: <biome annoying>
     process.env.SUPABASE_URL!,
