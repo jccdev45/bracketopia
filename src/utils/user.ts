@@ -4,51 +4,54 @@ import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 export const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
-	const supabase = await getSupabaseServerClient();
-	const { data, error: _error } = await supabase.auth.getUser();
+  const supabase = await getSupabaseServerClient();
+  const { data, error: _error } = await supabase.auth.getUser();
 
-	if (!data.user?.email) {
-		return null;
-	}
+  if (!data.user?.email) {
+    return null;
+  }
 
-	return data.user;
+  return data.user;
 });
 
 export const loginFn = createServerFn()
-	.validator((d: LoginSchemaValues) => d)
-	.handler(async ({ data }) => {
-		console.log("🚀 ~ .handler ~ data:", data);
-		const supabase = await getSupabaseServerClient();
-		const { error } = await supabase.auth.signInWithPassword({
-			email: data.email,
-			password: data.password,
-		});
+  .validator((data: LoginSchemaValues) => data)
+  .handler(async ({ data }) => {
+    const supabase = await getSupabaseServerClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
 
-		if (error) {
-			return {
-				error: true,
-				message: error.message,
-			};
-		}
-	});
+    if (error) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    }
+  });
 
 export const signupFn = createServerFn()
-	.validator((d: SignupSchemaValues & { redirectUrl?: string }) => d)
-	.handler(async ({ data }) => {
-		const supabase = await getSupabaseServerClient();
-		const { error } = await supabase.auth.signUp({
-			email: data.email,
-			password: data.password,
-		});
-		if (error) {
-			return {
-				error: true,
-				message: error.message,
-			};
-		}
+  .validator((data: SignupSchemaValues & { redirectUrl?: string }) => data)
+  .handler(async ({ data }) => {
+    const supabase = await getSupabaseServerClient();
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          username: data.username,
+        },
+      },
+    });
+    if (error) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    }
 
-		// Redirect to the prev page stored in the "redirect" search param
-		throw redirect({
-			href: data.redirectUrl || "/",
-		});
-	});
+    throw redirect({
+      href: data.redirectUrl || "/",
+    });
+  });

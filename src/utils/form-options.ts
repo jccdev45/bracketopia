@@ -1,18 +1,20 @@
 import { formOptions } from "@tanstack/react-form";
 
 const sharedOpts = {
-	email: "",
-	password: "",
+  email: "",
+  password: "",
 };
 
 export const signUpFormOpts = formOptions({
-	defaultValues: {
-		...sharedOpts,
-		username: "",
-		confirmPassword: "",
-	},
+  defaultValues: {
+    ...sharedOpts,
+    username: "",
+    confirmPassword: "",
+  },
 });
 
 export const loginFormOpts = formOptions({
-	defaultValues: sharedOpts,
+  defaultValues: sharedOpts,
 });
+
+export const formOpts = { ...loginFormOpts, ...signUpFormOpts };
