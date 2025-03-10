@@ -46,10 +46,10 @@ export function Register() {
 			<Card className="w-full max-w-md">
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-2xl font-bold text-center">
-						Login
+						Sign Up
 					</CardTitle>
 					<CardDescription className="text-center">
-						Enter your credentials to access your account
+						Sign up for a Bracketopia account
 					</CardDescription>
 				</CardHeader>
 				<CardContent>

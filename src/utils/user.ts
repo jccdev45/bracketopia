@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/integrations/supabase/server";
+import type { LoginSchemaValues, SignupSchemaValues } from "@/schema/auth";
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
@@ -14,7 +15,7 @@ export const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const loginFn = createServerFn()
-	.validator((d: { email: string; password: string }) => d)
+	.validator((d: LoginSchemaValues) => d)
 	.handler(async ({ data }) => {
 		console.log("🚀 ~ .handler ~ data:", data);
 		const supabase = await getSupabaseServerClient();
@@ -32,10 +33,7 @@ export const loginFn = createServerFn()
 	});
 
 export const signupFn = createServerFn()
-	.validator(
-		(d: unknown) =>
-			d as { email: string; password: string; redirectUrl?: string },
-	)
+	.validator((d: SignupSchemaValues & { redirectUrl?: string }) => d)
 	.handler(async ({ data }) => {
 		const supabase = await getSupabaseServerClient();
 		const { error } = await supabase.auth.signUp({
