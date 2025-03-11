@@ -5,3 +5,7 @@ dist-ssr
 *.local
 /.env
 /stash
+/todo.txt
+
+# windsurf rules
+.windsurfrules
