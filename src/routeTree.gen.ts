@@ -20,12 +20,12 @@ import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as AuthedTournamentsImport } from './routes/_authed/tournaments'
 import { Route as AuthedMyTournamentsImport } from './routes/_authed/my-tournaments'
 import { Route as AuthedTournamentsIndexImport } from './routes/_authed/tournaments.index'
-import { Route as AuthedProfileIndexImport } from './routes/_authed/profile.index'
 import { Route as DemoStartServerFuncsImport } from './routes/demo.start.server-funcs'
 import { Route as DemoFormSimpleImport } from './routes/demo.form.simple'
 import { Route as DemoFormAddressImport } from './routes/demo.form.address'
 import { Route as AuthedTournamentsIdImport } from './routes/_authed/tournaments.$id'
 import { Route as AuthedTournamentsCreateIndexImport } from './routes/_authed/tournaments_.create.index'
+import { Route as AuthedProfileIdIndexImport } from './routes/_authed/profile.$id.index'
 
 // Create/Update Routes
 
@@ -82,12 +82,6 @@ const AuthedTournamentsIndexRoute = AuthedTournamentsIndexImport.update({
   getParentRoute: () => AuthedTournamentsRoute,
 } as any)
 
-const AuthedProfileIndexRoute = AuthedProfileIndexImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => AuthedRoute,
-} as any)
-
 const DemoStartServerFuncsRoute = DemoStartServerFuncsImport.update({
   id: '/demo/start/server-funcs',
   path: '/demo/start/server-funcs',
@@ -118,6 +112,12 @@ const AuthedTournamentsCreateIndexRoute =
     path: '/tournaments/create/',
     getParentRoute: () => AuthedRoute,
   } as any)
+
+const AuthedProfileIdIndexRoute = AuthedProfileIdIndexImport.update({
+  id: '/profile/$id/',
+  path: '/profile/$id/',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -207,19 +207,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartServerFuncsImport
       parentRoute: typeof rootRoute
     }
-    '/_authed/profile/': {
-      id: '/_authed/profile/'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthedProfileIndexImport
-      parentRoute: typeof AuthedImport
-    }
     '/_authed/tournaments/': {
       id: '/_authed/tournaments/'
       path: '/'
       fullPath: '/tournaments/'
       preLoaderRoute: typeof AuthedTournamentsIndexImport
       parentRoute: typeof AuthedTournamentsImport
+    }
+    '/_authed/profile/$id/': {
+      id: '/_authed/profile/$id/'
+      path: '/profile/$id'
+      fullPath: '/profile/$id'
+      preLoaderRoute: typeof AuthedProfileIdIndexImport
+      parentRoute: typeof AuthedImport
     }
     '/_authed/tournaments_/create/': {
       id: '/_authed/tournaments_/create/'
@@ -249,14 +249,14 @@ const AuthedTournamentsRouteWithChildren =
 interface AuthedRouteChildren {
   AuthedMyTournamentsRoute: typeof AuthedMyTournamentsRoute
   AuthedTournamentsRoute: typeof AuthedTournamentsRouteWithChildren
-  AuthedProfileIndexRoute: typeof AuthedProfileIndexRoute
+  AuthedProfileIdIndexRoute: typeof AuthedProfileIdIndexRoute
   AuthedTournamentsCreateIndexRoute: typeof AuthedTournamentsCreateIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedMyTournamentsRoute: AuthedMyTournamentsRoute,
   AuthedTournamentsRoute: AuthedTournamentsRouteWithChildren,
-  AuthedProfileIndexRoute: AuthedProfileIndexRoute,
+  AuthedProfileIdIndexRoute: AuthedProfileIdIndexRoute,
   AuthedTournamentsCreateIndexRoute: AuthedTournamentsCreateIndexRoute,
 }
 
@@ -276,8 +276,8 @@ export interface FileRoutesByFullPath {
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/profile': typeof AuthedProfileIndexRoute
   '/tournaments/': typeof AuthedTournamentsIndexRoute
+  '/profile/$id': typeof AuthedProfileIdIndexRoute
   '/tournaments/create': typeof AuthedTournamentsCreateIndexRoute
 }
 
@@ -293,8 +293,8 @@ export interface FileRoutesByTo {
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/profile': typeof AuthedProfileIndexRoute
   '/tournaments': typeof AuthedTournamentsIndexRoute
+  '/profile/$id': typeof AuthedProfileIdIndexRoute
   '/tournaments/create': typeof AuthedTournamentsCreateIndexRoute
 }
 
@@ -312,8 +312,8 @@ export interface FileRoutesById {
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/_authed/profile/': typeof AuthedProfileIndexRoute
   '/_authed/tournaments/': typeof AuthedTournamentsIndexRoute
+  '/_authed/profile/$id/': typeof AuthedProfileIdIndexRoute
   '/_authed/tournaments_/create/': typeof AuthedTournamentsCreateIndexRoute
 }
 
@@ -332,8 +332,8 @@ export interface FileRouteTypes {
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/server-funcs'
-    | '/profile'
     | '/tournaments/'
+    | '/profile/$id'
     | '/tournaments/create'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -348,8 +348,8 @@ export interface FileRouteTypes {
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/server-funcs'
-    | '/profile'
     | '/tournaments'
+    | '/profile/$id'
     | '/tournaments/create'
   id:
     | '__root__'
@@ -365,8 +365,8 @@ export interface FileRouteTypes {
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/start/server-funcs'
-    | '/_authed/profile/'
     | '/_authed/tournaments/'
+    | '/_authed/profile/$id/'
     | '/_authed/tournaments_/create/'
   fileRoutesById: FileRoutesById
 }
@@ -424,7 +424,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authed/my-tournaments",
         "/_authed/tournaments",
-        "/_authed/profile/",
+        "/_authed/profile/$id/",
         "/_authed/tournaments_/create/"
       ]
     },
@@ -465,13 +465,13 @@ export const routeTree = rootRoute
     "/demo/start/server-funcs": {
       "filePath": "demo.start.server-funcs.tsx"
     },
-    "/_authed/profile/": {
-      "filePath": "_authed/profile.index.tsx",
-      "parent": "/_authed"
-    },
     "/_authed/tournaments/": {
       "filePath": "_authed/tournaments.index.tsx",
       "parent": "/_authed/tournaments"
+    },
+    "/_authed/profile/$id/": {
+      "filePath": "_authed/profile.$id.index.tsx",
+      "parent": "/_authed"
     },
     "/_authed/tournaments_/create/": {
       "filePath": "_authed/tournaments_.create.index.tsx",

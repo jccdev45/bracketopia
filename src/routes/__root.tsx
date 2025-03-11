@@ -146,7 +146,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/profile">Profile</Link>
+                      <Link to="/profile/$id" params={{
+                            id: user.id
+                          }}>Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/my-tournaments">My Tournaments</Link>
@@ -186,7 +188,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     {user ? (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link to="/profile">Profile</Link>
+                          <Link to="/profile/$id" params={{
+                            id: user.id
+                          }}>Profile</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/my-tournaments">My Tournaments</Link>
