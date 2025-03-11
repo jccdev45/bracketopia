@@ -82,7 +82,11 @@ export const Route = createRootRoute({
     );
   },
   notFoundComponent: () => <NotFound />,
-  component: () => (
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
     <RootDocument>
       <TanstackQueryProvider>
         <Toaster />
@@ -91,8 +95,8 @@ export const Route = createRootRoute({
         <TanstackQueryLayout />
       </TanstackQueryProvider>
     </RootDocument>
-  ),
-});
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { user } = Route.useRouteContext();
@@ -114,10 +118,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   <Link
-                    to="/"
+                    // @ts-expect-error dev route
+                    to="/api/auth/dev/login"
+                    search={{
+                      // @ts-expect-error dev route
+                      email: "filiberto_walker71127@bleakcricket.org",
+                      password: "password",
+                    }}
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   >
-                    Home
+                    ** Dev Route **
                   </Link>
                   <Link
                     to="/tournaments"
@@ -126,8 +136,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     Tournaments
                   </Link>
                   {user && (
-                    <Link to="/tournaments/create"
-                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                    <Link
+                      to="/tournaments/create"
+                      className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                     >
                       Create Tournament
                     </Link>
@@ -146,9 +157,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                      <Link to="/profile/$id" params={{
-                            id: user.id
-                          }}>Profile</Link>
+                        <Link
+                          to="/profile/$id"
+                          params={{
+                            id: user.id,
+                          }}
+                        >
+                          Profile
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/my-tournaments">My Tournaments</Link>
@@ -188,9 +204,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     {user ? (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link to="/profile/$id" params={{
-                            id: user.id
-                          }}>Profile</Link>
+                          <Link
+                            to="/profile/$id"
+                            params={{
+                              id: user.id,
+                            }}
+                          >
+                            Profile
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/my-tournaments">My Tournaments</Link>
