@@ -3,6 +3,11 @@ import type { Structure, TournamentInsert } from "@/types/tournament.types";
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
+export interface TournamentStats {
+  totalTournaments: number;
+  totalParticipantSlots: number;
+}
+
 export const tournamentQueries = {
   list: () =>
     queryOptions({
@@ -14,7 +19,30 @@ export const tournamentQueries = {
       queryKey: ["tournaments", "detail", id],
       queryFn: () => fetchTournament({ data: id }),
     }),
+  stats: () =>
+    queryOptions({
+      queryKey: ["tournaments", "stats"],
+      queryFn: () => fetchTournamentStats(),
+    }),
 };
+
+export const fetchTournamentStats = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("tournaments")
+      .select("max_participants");
+
+    if (error) throw error;
+
+    const stats: TournamentStats = {
+      totalTournaments: data.length,
+      totalParticipantSlots: data.reduce((acc, t) => acc + (t.max_participants || 0), 0),
+    };
+
+    return stats;
+  },
+);
 
 export const fetchTournaments = createServerFn({ method: "GET" }).handler(
   async () => {
