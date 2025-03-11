@@ -55,7 +55,7 @@ export function TextField({
   return (
     <div>
       {/* previous label style: className="block font-bold mb-1 text-xl" */}
-      <Label htmlFor={label}>
+      <Label htmlFor={label} className="grid">
         {label}
         <Input
           value={field.state.value}
@@ -63,6 +63,7 @@ export function TextField({
           onBlur={field.handleBlur}
           type={type}
           onChange={(e) => field.handleChange(e.target.value)}
+          className="w-full"
           // previous style: className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </Label>
