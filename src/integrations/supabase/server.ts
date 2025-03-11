@@ -1,4 +1,4 @@
-import type { Database } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/generated.types";
 import { createServerClient } from "@supabase/ssr";
 import { parseCookies, setCookie } from "@tanstack/react-start/server";
 

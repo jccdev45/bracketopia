@@ -1,5 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "./types";
+import type { Database } from "./generated.types";
 
 const SUPABASE_URL = "https://kidlbinekhuoqcqyupbn.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
