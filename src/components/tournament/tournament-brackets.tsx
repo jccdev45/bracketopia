@@ -1,42 +1,76 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { TournamentBracket } from "@/types/tournament.types";
+import { fetchBracket, generateBracket, updateMatchResult } from "@/utils/bracketService";
+import { useParams } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BracketView } from "./bracket-view";
 
 interface TournamentBracketsProps {
   brackets: TournamentBracket[];
+  participants: { id: string; user_id: string }[];
 }
 
-export function TournamentBrackets({ brackets }: TournamentBracketsProps) {
+export function TournamentBrackets({ brackets, participants }: TournamentBracketsProps) {
+  const { id: tournamentId } = useParams({ from: "/_authed/tournaments/$id" });
+  const queryClient = useQueryClient();
+
+  const { data: bracketData } = useQuery({
+    queryKey: ["bracket", tournamentId],
+    queryFn: () => fetchBracket({ data: { tournamentId } }),
+    enabled: brackets.length > 0,
+  });
+
+  const generateBracketMutation = useMutation({
+    mutationFn: () => generateBracket({ data: { tournamentId, participants } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bracket", tournamentId] });
+    },
+  });
+
+  const updateMatchMutation = useMutation({
+    mutationFn: ({ matchId, winnerId }: { matchId: string; winnerId: string }) =>
+      updateMatchResult({
+        data: {
+          tournamentId,
+          matchId,
+          score1: 1,
+          score2: 0,
+          winnerId,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bracket", tournamentId] });
+    },
+  });
+
+  const handleGenerateBracket = () => {
+    generateBracketMutation.mutate();
+  };
+
+  const handleUpdateMatch = (matchId: string, winnerId: string) => {
+    updateMatchMutation.mutate({ matchId, winnerId });
+  };
+
+  if (!bracketData && brackets.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <p className="text-muted-foreground mb-4">No brackets have been generated yet.</p>
+        <Button
+          onClick={handleGenerateBracket}
+          disabled={participants.length < 2 || generateBracketMutation.isPending}
+        >
+          {generateBracketMutation.isPending ? "Generating..." : "Generate Bracket"}
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Brackets</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Accordion type="single" collapsible>
-          {brackets.map((bracket) => (
-            <AccordionItem key={bracket.id} value={bracket.id}>
-              <AccordionTrigger>
-                <div className="flex items-center space-x-4">
-                  <span>Bracket (Round {bracket.current_round})</span>
-                  <Badge variant="outline">
-                    {bracket.structure.rounds} Rounds
-                  </Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <pre>{JSON.stringify(bracket.structure.matches, null, 2)}</pre>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </CardContent>
-    </Card>
+    <ScrollArea className="h-[600px]">
+      {bracketData && (
+        <BracketView bracket={bracketData} onUpdateMatch={handleUpdateMatch} />
+      )}
+    </ScrollArea>
   );
 }
