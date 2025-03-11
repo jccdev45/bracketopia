@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/use-app-form";
 import { loginSchema } from "@/schema/auth";
-import { getFormDataFromServer, handleForm } from "@/utils/form";
 import { loginFormOpts } from "@/utils/form-options";
 import { loginFn } from "@/utils/user";
-import { mergeForm, useTransform } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
@@ -20,26 +18,24 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
-  loader: async () => ({
-    state: await getFormDataFromServer(),
-  }),
 });
 
 function RouteComponent() {
-  const { state } = Route.useLoaderData();
   const router = useRouter();
 
   const loginMutation = useMutation({
     mutationFn: loginFn,
     onSuccess: async (ctx) => {
       if (!ctx?.error) {
+        toast.success("Welcome back!");
         await router.invalidate();
         router.navigate({ to: "/" });
-        return;
+      } else {
+        toast.error(ctx?.message || "Login failed");
       }
     },
     onError: (error) => {
-      toast.error(`There was an error: ${error.message}`);
+      toast.error(`Network error: ${error.message}`);
     },
   });
 
@@ -48,11 +44,9 @@ function RouteComponent() {
     validators: {
       onBlur: loginSchema,
     },
-    transform: useTransform((baseForm) => mergeForm(baseForm, state), [state]),
     onSubmit: async ({ formApi, value }) => {
       await loginMutation.mutateAsync({ data: value });
 
-      toast.success("Welcome back!");
       formApi.reset();
     },
   });
@@ -60,16 +54,13 @@ function RouteComponent() {
   return (
     <div className="flex items-center justify-center">
       <form
-        action={handleForm.url}
-        method="POST"
-        encType="multipart/form-data"
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
         }}
       >
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-lg">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
               Login
@@ -78,7 +69,7 @@ function RouteComponent() {
               Enter your credentials or login with a provider
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2">
             <form.AppField
               name="email"
               children={(field) => {
@@ -104,13 +95,20 @@ function RouteComponent() {
               }}
             />
           </CardContent>
-          <CardFooter className="justify-between">
-            <Button variant="ghost" asChild>
-              <Link to="/register">Don't have an account?</Link>
-            </Button>
-            <form.AppForm>
-              <form.SubscribeButton label="Login" />
-            </form.AppForm>
+          <CardFooter className="flex-col">
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" asChild>
+                <Link to="/register">Don't have an account?</Link>
+              </Button>
+              <form.AppForm>
+                <form.SubscribeButton label="Login" />
+              </form.AppForm>
+            </div>
+            <div className="block text-balance text-center">
+              {loginMutation.data ? (
+                <div className="text-red-400">{loginMutation.data.message}</div>
+              ) : null}
+            </div>
           </CardFooter>
         </Card>
       </form>

@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/use-app-form";
 import { signupSchema } from "@/schema/auth";
-import { handleForm } from "@/utils/form";
 import { signUpFormOpts } from "@/utils/form-options";
 import { signupFn } from "@/utils/user";
 import { useMutation } from "@tanstack/react-query";
@@ -23,13 +22,14 @@ export const Route = createFileRoute("/register")({
 
 function RouteComponent() {
   const router = useRouter();
+
   const signupMutation = useMutation({
     mutationFn: signupFn,
     onSuccess: async (ctx) => {
       if (!ctx?.error) {
+        toast.success("Signup successful!");
         await router.invalidate();
         router.navigate({ to: "/" });
-        toast.success("Signup successful! Please login.");
       } else {
         toast.error(ctx?.message || "Signup failed.");
       }
@@ -42,24 +42,23 @@ function RouteComponent() {
   const form = useAppForm({
     ...signUpFormOpts,
     validators: { onBlur: signupSchema },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ formApi, value }) => {
       await signupMutation.mutateAsync({ data: value });
+
+      formApi.reset();
     },
   });
 
   return (
     <div className="flex items-center justify-center">
       <form
-        action={handleForm.url}
-        method="POST"
-        encType="multipart/form-data"
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
         }}
       >
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-lg">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
               Sign Up
@@ -68,7 +67,7 @@ function RouteComponent() {
               Sign up for a Bracketopia account
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-2">
             <form.AppField
               name="email"
               children={(field) => {
@@ -78,6 +77,14 @@ function RouteComponent() {
                     type="email"
                     placeholder="your@email.com"
                   />
+                );
+              }}
+            />
+            <form.AppField
+              name="username"
+              children={(field) => {
+                return (
+                  <field.TextField label="Username" placeholder="coolguy123" />
                 );
               }}
             />
@@ -94,13 +101,22 @@ function RouteComponent() {
               }}
             />
           </CardContent>
-          <CardFooter className="justify-between">
-            <Button variant="ghost" asChild>
-              <Link to="/login">Already have an account?</Link>
-            </Button>
-            <form.AppForm>
-              <form.SubscribeButton label="Register" />
-            </form.AppForm>
+          <CardFooter className="flex-col">
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" asChild>
+                <Link to="/login">Already have an account?</Link>
+              </Button>
+              <form.AppForm>
+                <form.SubscribeButton label="Register" />
+              </form.AppForm>
+            </div>
+            <div className="block text-balance text-center">
+              {signupMutation.data ? (
+                <div className="text-red-400">
+                  {signupMutation.data.message}
+                </div>
+              ) : null}
+            </div>
           </CardFooter>
         </Card>
       </form>
