@@ -17,4 +17,13 @@ export const loginFormOpts = formOptions({
   defaultValues: sharedOpts,
 });
 
-export const formOpts = { ...loginFormOpts, ...signUpFormOpts };
+export const authFormOpts = { ...loginFormOpts, ...signUpFormOpts };
+
+export const addTournamentFormOpts = formOptions({
+  defaultValues: {
+    title: "",
+    description: "",
+    max_participants: 8,
+    registration_open: true,
+  },
+});

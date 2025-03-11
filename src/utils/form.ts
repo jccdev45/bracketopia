@@ -1,4 +1,4 @@
-import { formOpts } from "@/utils/form-options";
+import { authFormOpts } from "@/utils/form-options";
 import {
   ServerValidateError,
   createServerValidate,
@@ -9,7 +9,7 @@ import { setResponseStatus } from "@tanstack/react-start/server";
 
 // TODO: Verify what server-side validation is needed
 const serverValidate = createServerValidate({
-  ...formOpts,
+  ...authFormOpts,
   onServerValidate: ({ value }) => {
     if (value.username.length < 3) {
       return "Username must be more than 3 characters";

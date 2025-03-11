@@ -1,10 +1,20 @@
 import { createClient } from "@/integrations/supabase/server";
-import type {
-  FullTournament,
-  Structure,
-  TournamentInsert,
-} from "@/types/tournament.types";
+import type { Structure, TournamentInsert } from "@/types/tournament.types";
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+
+export const tournamentQueries = {
+  list: () =>
+    queryOptions({
+      queryKey: ["tournaments", "list"],
+      queryFn: () => fetchTournaments(),
+    }),
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: ["tournaments", "detail", id],
+      queryFn: () => fetchTournament({ data: id }),
+    }),
+};
 
 export const fetchTournaments = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -22,7 +32,7 @@ export const fetchTournaments = createServerFn({ method: "GET" }).handler(
 
 export const fetchTournament = createServerFn({ method: "GET" })
   .validator((d: string) => d)
-  .handler(async ({ data: id }): Promise<FullTournament> => {
+  .handler(async ({ data: id }) => {
     const supabase = createClient();
 
     // Fetch tournament data with participants
@@ -71,7 +81,8 @@ export const fetchTournament = createServerFn({ method: "GET" })
       }>();
 
     if (tournamentError) {
-      throw new Error(`Failed to fetch tournament: ${tournamentError.message}`);
+      console.error(`Failed to fetch tournament: ${tournamentError.message}`);
+      return tournamentError;
     }
 
     const { profiles, tournament_brackets, tournament_participants } =
@@ -89,7 +100,7 @@ export const fetchTournament = createServerFn({ method: "GET" })
 
 export const addTournament = createServerFn({ method: "POST" })
   .validator((d: TournamentInsert) => d)
-  .handler(async ({ data }): Promise<FullTournament> => {
+  .handler(async ({ data }) => {
     const supabase = createClient();
 
     // Validate max_participants
@@ -105,7 +116,7 @@ export const addTournament = createServerFn({ method: "POST" })
         description: data.description || null,
         max_participants: data.max_participants,
         creator_id: data.creator_id,
-        registration_open: data.registration_open || true, // Default to true if not provided
+        registration_open: data.registration_open || true,
       })
       .select()
       .single();
