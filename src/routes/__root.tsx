@@ -118,18 +118,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   <Link
-                    // @ts-expect-error dev route
-                    to="/api/auth/dev/login"
-                    search={{
-                      // @ts-expect-error dev route
-                      email: "filiberto_walker71127@bleakcricket.org",
-                      password: "password",
-                    }}
-                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  >
-                    ** Dev Route **
-                  </Link>
-                  <Link
                     to="/tournaments"
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   >
