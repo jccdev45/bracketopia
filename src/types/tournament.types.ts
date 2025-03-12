@@ -4,20 +4,19 @@ import type {
   TablesInsert,
   TablesUpdate,
 } from "@/integrations/supabase/generated.types";
-
-export type User = Tables<"profiles">;
+import type { Profile } from "@/types/profile.types";
 
 // Explicit enum for match status
 export type MatchStatus = "pending" | "completed" | "cancelled";
 
 // Type for tournament participants
 export type TournamentParticipant = Tables<"tournament_participants"> & {
-  profiles?: User | null;
+  profiles?: Profile | null;
 };
 
 // Type for tournament moderators
 export type TournamentModerator = Tables<"tournament_moderators"> & {
-  profiles?: User | null;
+  profiles?: Profile | null;
 };
 
 // Type for tournament matches
@@ -45,11 +44,16 @@ export interface Structure {
 export type Tournament = Tables<"tournaments">;
 
 export type FullTournament = Tables<"tournaments"> & {
-  creator: User | null;
+  creator: Profile | null;
   tournament_participants: TournamentParticipant[];
   tournament_brackets: TournamentBracket[];
   tournament_moderators: TournamentModerator[];
 };
+
+export interface TournamentStats {
+  totalTournaments: number;
+  totalParticipantSlots: number;
+}
 
 // Insert types
 export type TournamentInsert = TablesInsert<"tournaments">;

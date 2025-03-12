@@ -2,10 +2,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchProfile, fetchUserTournaments } from "@/utils/profiles";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, Trophy, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fetchProfile, fetchUserTournaments } from "@/utils/serverFn/profiles";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { CalendarDays, Trophy, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authed/profile/$id/")({
   component: RouteComponent,
@@ -74,7 +74,9 @@ function RouteComponent() {
                         <div className="text-sm text-muted-foreground space-y-1">
                           <div className="flex items-center">
                             <Users className="h-4 w-4 mr-2" />
-                            <span>{tournament.max_participants} participants</span>
+                            <span>
+                              {tournament.max_participants} participants
+                            </span>
                           </div>
                           <div className="flex items-center">
                             <Trophy className="h-4 w-4 mr-2" />
@@ -85,7 +87,9 @@ function RouteComponent() {
                           <div className="flex items-center">
                             <CalendarDays className="h-4 w-4 mr-2" />
                             <span>
-                              {new Date(tournament.created_at).toLocaleDateString()}
+                              {new Date(
+                                tournament.created_at,
+                              ).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
@@ -129,7 +133,9 @@ function RouteComponent() {
                         <div className="text-sm text-muted-foreground space-y-1">
                           <div className="flex items-center">
                             <Users className="h-4 w-4 mr-2" />
-                            <span>{tournament.max_participants} participants</span>
+                            <span>
+                              {tournament.max_participants} participants
+                            </span>
                           </div>
                           <div className="flex items-center">
                             <Trophy className="h-4 w-4 mr-2" />
@@ -140,7 +146,9 @@ function RouteComponent() {
                           <div className="flex items-center">
                             <CalendarDays className="h-4 w-4 mr-2" />
                             <span>
-                              {new Date(tournament.created_at).toLocaleDateString()}
+                              {new Date(
+                                tournament.created_at,
+                              ).toLocaleDateString()}
                             </span>
                           </div>
                         </div>

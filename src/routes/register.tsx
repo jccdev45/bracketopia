@@ -10,7 +10,7 @@ import {
 import { useAppForm } from "@/hooks/use-app-form";
 import { signupSchema } from "@/schema/auth";
 import { signUpFormOpts } from "@/utils/form-options";
-import { signupFn } from "@/utils/user";
+import { signupFn } from "@/utils/serverFn/auth";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";

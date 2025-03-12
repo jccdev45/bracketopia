@@ -10,7 +10,7 @@ import {
 import { useAppForm } from "@/hooks/use-app-form";
 import { loginSchema } from "@/schema/auth";
 import { loginFormOpts } from "@/utils/form-options";
-import { loginFn } from "@/utils/user";
+import { emailPasswordLoginFn } from "@/utils/serverFn/auth";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
@@ -24,7 +24,7 @@ function RouteComponent() {
   const router = useRouter();
 
   const loginMutation = useMutation({
-    mutationFn: loginFn,
+    mutationFn: emailPasswordLoginFn,
     onSuccess: async (ctx) => {
       if (!ctx?.error) {
         toast.success("Welcome back!");

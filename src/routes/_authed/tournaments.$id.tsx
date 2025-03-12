@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { FullTournament } from "@/types/tournament.types";
-import { fetchTournament } from "@/utils/tournaments";
+import { fetchTournament } from "@/utils/serverFn/tournaments";
 import { createFileRoute } from "@tanstack/react-router";
 import { CalendarDays, Trophy, Users } from "lucide-react";
 
@@ -31,7 +31,9 @@ function RouteComponent() {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">{tournament.title}</h1>
             <Button variant="outline">
-              {tournament.registration_open ? "Registration Open" : "Registration Closed"}
+              {tournament.registration_open
+                ? "Registration Open"
+                : "Registration Closed"}
             </Button>
           </div>
           <div className="flex items-center space-x-6 text-sm text-muted-foreground">
@@ -41,7 +43,10 @@ function RouteComponent() {
             </div>
             <div className="flex items-center">
               <CalendarDays className="h-4 w-4 mr-2" />
-              <span>Created on {new Date(tournament.created_at).toLocaleDateString()}</span>
+              <span>
+                Created on{" "}
+                {new Date(tournament.created_at).toLocaleDateString()}
+              </span>
             </div>
             <div className="flex items-center">
               <Trophy className="h-4 w-4 mr-2" />
@@ -49,7 +54,9 @@ function RouteComponent() {
             </div>
           </div>
           {tournament.description && (
-            <p className="mt-4 text-sm text-muted-foreground">{tournament.description}</p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              {tournament.description}
+            </p>
           )}
         </div>
       </div>
@@ -66,7 +73,8 @@ function RouteComponent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">
-                    Participants ({tournament.tournament_participants?.length || 0}/
+                    Participants (
+                    {tournament.tournament_participants?.length || 0}/
                     {tournament.max_participants})
                   </CardTitle>
                 </CardHeader>
@@ -83,12 +91,14 @@ function RouteComponent() {
                   <CardTitle className="text-lg">Tournament Brackets</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TournamentBrackets 
-                    brackets={tournament.tournament_brackets} 
-                    participants={tournament.tournament_participants?.map(p => ({ 
-                      id: p.id, 
-                      user_id: p.user_id 
-                    })) || []}
+                  <TournamentBrackets
+                    brackets={tournament.tournament_brackets}
+                    participants={
+                      tournament.tournament_participants?.map((p) => ({
+                        id: p.id,
+                        user_id: p.user_id,
+                      })) || []
+                    }
                   />
                 </CardContent>
               </Card>
@@ -96,10 +106,14 @@ function RouteComponent() {
             <TabsContent value="moderators" className="mt-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Tournament Moderators</CardTitle>
+                  <CardTitle className="text-lg">
+                    Tournament Moderators
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TournamentModerators moderators={tournament.tournament_moderators} />
+                  <TournamentModerators
+                    moderators={tournament.tournament_moderators}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

@@ -1,6 +1,18 @@
 import { createClient } from "@/integrations/supabase/server";
 import type { TournamentParticipant } from "@/types/tournament.types";
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+
+// TODO: Add more functions and when finished, expand JSDoc
+
+export const participantsQueryOptions = {
+  list: (tournamentId: string) =>
+    queryOptions({
+      queryKey: ["participants", tournamentId],
+      queryFn: async () =>
+        fetchParticipantsWithProfiles({ data: tournamentId }),
+    }),
+};
 
 export const fetchParticipantsWithProfiles = createServerFn({ method: "GET" })
   .validator((d: string) => d)
