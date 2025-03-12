@@ -10,37 +10,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
-import { createClient } from "@/integrations/supabase/server";
 import { seo } from "@/utils/seo";
+import { fetchUserFn } from "@/utils/serverFn/auth";
+import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
   Link,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { createServerFn } from "@tanstack/react-start";
 import { Menu, UserIcon } from "lucide-react";
 import TanstackQueryLayout from "../integrations/tanstack-query/layout";
 import TanstackQueryProvider from "../integrations/tanstack-query/provider";
 import appCss from "../styles.css?url";
 
-// NOTE: this whole function is direct from https://github.com/TanStack/router/blob/1b402d502fedb84cb073994335b2780169ecc8d7/examples/react/start-supabase-basic/src/routes/__root.tsx#L17
-// idk why handler errors, I'm probably fucking something up somewhere
-// @ts-expect-error
-const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
-  const supabase = await createClient();
-  const { data, error: _error } = await supabase.auth.getUser();
-
-  if (!data.user?.email) {
-    return null;
-  }
-
-  return data.user;
-});
-
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       {
@@ -68,7 +56,7 @@ export const Route = createRootRoute({
     ],
   }),
   beforeLoad: async () => {
-    const user = await fetchUser();
+    const user = await fetchUserFn();
 
     return {
       user,
