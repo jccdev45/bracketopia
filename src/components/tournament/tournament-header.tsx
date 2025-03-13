@@ -6,10 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { FullTournament } from "@/types/tournament.types";
+import type { TournamentWithDetails } from "@/types/tournament.types";
 
 interface TournamentHeaderProps {
-  tournament: FullTournament;
+  tournament: TournamentWithDetails;
 }
 
 export function TournamentHeader({ tournament }: TournamentHeaderProps) {

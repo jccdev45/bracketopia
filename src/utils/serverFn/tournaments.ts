@@ -3,8 +3,19 @@ import type {
   Structure,
   TournamentInsert,
   TournamentStats,
+  TournamentWithDetails,
 } from "@/types/tournament.types";
 import { createServerFn } from "@tanstack/react-start";
+
+class TournamentError extends Error {
+  constructor(
+    message: string,
+    public readonly code?: string,
+  ) {
+    super(message);
+    this.name = "TournamentError";
+  }
+}
 
 export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -13,7 +24,13 @@ export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
       .from("tournaments")
       .select("max_participants");
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to retrieve tournament stats.",
+        "TOURNAMENT_STATS_FETCH_FAILED",
+      );
+    }
 
     const stats: TournamentStats = {
       totalTournaments: data.length,
@@ -47,7 +64,13 @@ export const fetchTournamentsFn = createServerFn({ method: "GET" }).handler(
       )
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to retrieve tournaments.",
+        "TOURNAMENT_FETCH_FAILED",
+      );
+    }
 
     return data;
   },
@@ -110,30 +133,39 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
       }>();
 
     if (tournamentError) {
-      console.error(`Failed to fetch tournament: ${tournamentError.message}`);
-      return tournamentError;
+      console.error("Supabase error: ", tournamentError);
+      throw new TournamentError(
+        "Unable to retrieve tournament information.",
+        "TOURNAMENT_FETCH_FAILED",
+      );
     }
 
     const { profiles, tournament_brackets, tournament_participants } =
       tournamentData;
 
-    return {
+    const formattedTournamentData: TournamentWithDetails = {
       ...tournamentData,
       creator: profiles,
       tournament_brackets: tournament_brackets ? [tournament_brackets] : [],
-      tournament_participants: tournament_participants,
+      tournament_participants: tournament_participants || [], // if possible for this to be undefined or null
       tournament_moderators: [],
     };
+
+    return formattedTournamentData;
   });
 
 export const addTournamentFn = createServerFn({ method: "POST" })
-  .validator((d: TournamentInsert) => d)
+  .validator((d: TournamentInsert) => {
+    if (d.max_participants <= 0) {
+      throw new TournamentError(
+        "max_participants must be a positive number",
+        "INVALID_MAX_PARTICIPANTS",
+      );
+    }
+    return d;
+  })
   .handler(async ({ data }) => {
     const supabase = createClient();
-
-    if (data.max_participants <= 0) {
-      throw new Error("max_participants must be a positive number");
-    }
 
     const { data: tournamentData, error } = await supabase
       .from("tournaments")
@@ -148,7 +180,11 @@ export const addTournamentFn = createServerFn({ method: "POST" })
       .single();
 
     if (error) {
-      throw new Error(`Failed to insert tournament: ${error.message}`);
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to create tournament.",
+        "TOURNAMENT_CREATE_FAILED",
+      );
     }
 
     return {
@@ -165,11 +201,13 @@ export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabase.from("tournaments").select("title");
 
     if (error) {
-      throw new Error(`Failed to fetch tournament names: ${error.message}`);
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to retrieve tournament names.",
+        "TOURNAMENT_NAMES_FETCH_FAILED",
+      );
     }
 
-    return {
-      data,
-    };
+    return data;
   },
 );

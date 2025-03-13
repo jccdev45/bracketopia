@@ -11,17 +11,15 @@ export type MatchStatus = "pending" | "completed" | "cancelled";
 
 // Type for tournament participants
 export type TournamentParticipant = Tables<"tournament_participants">;
-export type TournamentParticipantWithProfile =
-  Tables<"tournament_participants"> & {
-    profiles?: Profile | null;
-  };
+export type TournamentParticipantWithProfile = TournamentParticipant & {
+  profiles?: Profile | null;
+};
 
 // Type for tournament moderators
 export type TournamentModerator = Tables<"tournament_moderators">;
-export type TournamentModeratorWithProfiles =
-  Tables<"tournament_moderators"> & {
-    profiles?: Profile | null;
-  };
+export type TournamentModeratorWithProfiles = TournamentModerator & {
+  profiles?: Profile | null;
+};
 
 // Type for tournament matches
 export type TournamentMatch = Tables<"tournament_matches"> & {
@@ -47,11 +45,15 @@ export interface Structure {
 // Type for tournaments
 export type Tournament = Tables<"tournaments">;
 
-export type FullTournament = Tables<"tournaments"> & {
+export type TournamentWithDetails = Tournament & {
   creator: Profile | null;
-  tournament_participants: TournamentParticipantWithProfile[];
+  tournament_participants:
+    | TournamentParticipant[]
+    | TournamentParticipantWithProfile[];
   tournament_brackets: TournamentBracket[];
-  tournament_moderators: TournamentModeratorWithProfiles[];
+  tournament_moderators:
+    | TournamentModerator[]
+    | TournamentModeratorWithProfiles[];
 };
 
 export interface TournamentStats {
