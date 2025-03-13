@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
+import TanstackQueryLayout from "@/integrations/tanstack-query/layout";
+import appCss from "@/styles/styles.css?url";
 import { seo } from "@/utils/config/seo";
 import { fetchUserFn } from "@/utils/serverFn/auth";
 import type { User } from "@supabase/supabase-js";
@@ -23,8 +25,6 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Menu, UserIcon } from "lucide-react";
-import TanstackQueryLayout from "../integrations/tanstack-query/layout";
-import appCss from "../styles.css?url";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -94,26 +94,29 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <nav className="bg-white border-b">
+        <nav className="bg-white border-b dark:bg-sidebar dark:border-sidebar">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex">
                 <div className="shrink-0 flex items-center">
-                  <Link to="/" className="text-xl font-bold text-gray-900">
+                  <Link
+                    to="/"
+                    className="text-xl font-bold text-primary-foreground dark:text-sidebar-primary-foreground"
+                  >
                     BracketOpia
                   </Link>
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   <Link
                     to="/tournaments"
-                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                    className="text-gray-500 hover:text-gray-700 dark:text-sidebar-foreground hover:dark:text-sidebar-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent hover:border-gray-300 dark:border-transparent hover:dark:border-sidebar-primary"
                   >
                     Tournaments
                   </Link>
                   {user && (
                     <Link
                       to="/tournaments/create"
-                      className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                      className="text-gray-500 hover:text-gray-700 dark:text-sidebar-foreground hover:dark:text-sidebar-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent hover:border-gray-300 dark:border-transparent hover:dark:border-sidebar-primary"
                     >
                       Create Tournament
                     </Link>
@@ -125,52 +128,79 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
-                        <UserIcon className="h-5 w-5" />
+                        <UserIcon className="h-5 w-5 text-gray-500 dark:text-sidebar-foreground" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuLabel className="text-gray-900 dark:text-sidebar-primary">
+                        My Account
+                      </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link
                           to="/profile/$id"
-                          params={{
-                            id: user.id,
-                          }}
+                          params={{ id: user.id }}
+                          className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
                         >
                           Profile
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/logout">Logout</Link>
+                        <Link
+                          to="/logout"
+                          className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                        >
+                          Logout
+                        </Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
                   <div className="flex space-x-2">
                     <Button variant="outline" asChild>
-                      <Link to="/login">Login</Link>
+                      <Link
+                        to="/login"
+                        className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                      >
+                        Login
+                      </Link>
                     </Button>
                     <Button asChild>
-                      <Link to="/register">Register</Link>
+                      <Link
+                        to="/register"
+                        className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                      >
+                        Register
+                      </Link>
                     </Button>
                   </div>
                 )}
               </div>
+              {/* Mobile Menu -  Add hover styles here too for consistency */}
               <div className="flex items-center sm:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon">
-                      <Menu className="h-5 w-5" />
+                      <Menu className="h-5 w-5 text-gray-500 dark:text-sidebar-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link to="/">Home</Link>
+                      <Link
+                        to="/"
+                        className="hover:text-gray-700 dark:hover:text-sidebar-primary"
+                      >
+                        Home
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/tournaments">Tournaments</Link>
+                      <Link
+                        to="/tournaments"
+                        className="hover:text-gray-700 dark:hover:text-sidebar-primary"
+                      >
+                        Tournaments
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     {user ? (
@@ -178,25 +208,39 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         <DropdownMenuItem asChild>
                           <Link
                             to="/profile/$id"
-                            params={{
-                              id: user.id,
-                            }}
+                            params={{ id: user.id }}
+                            className="hover:text-gray-700 dark:hover:text-sidebar-primary"
                           >
                             Profile
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link to="/logout">Logout</Link>
+                          <Link
+                            to="/logout"
+                            className="hover:text-gray-700 dark:hover:text-sidebar-primary"
+                          >
+                            Logout
+                          </Link>
                         </DropdownMenuItem>
                       </>
                     ) : (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link to="/login">Login</Link>
+                          <Link
+                            to="/login"
+                            className="hover:text-gray-700 dark:hover:text-sidebar-primary"
+                          >
+                            Login
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link to="/register">Register</Link>
+                          <Link
+                            to="/register"
+                            className="hover:text-gray-700 dark:hover:text-sidebar-primary"
+                          >
+                            Register
+                          </Link>
                         </DropdownMenuItem>
                       </>
                     )}
