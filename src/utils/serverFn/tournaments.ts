@@ -4,57 +4,9 @@ import type {
   TournamentInsert,
   TournamentStats,
 } from "@/types/tournament.types";
-import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
-/**
- * Query options for fetching tournament data.
- */
-export const tournamentQueryOptions = {
-  /**
-   * Options for fetching a list of tournaments.
-   * @returns Query options for fetching tournaments.
-   */
-  list: () =>
-    queryOptions({
-      queryKey: ["tournaments", "list"],
-      queryFn: async () => fetchTournaments(),
-    }),
-  /**
-   * Options for fetching a single tournament by ID.
-   * @param id - The ID of the tournament to fetch.
-   * @returns Query options for fetching a single tournament.
-   */
-  detail: (id: string) =>
-    queryOptions({
-      queryKey: ["tournaments", "detail", id],
-      queryFn: async () => fetchTournament({ data: id }),
-    }),
-  /**
-   * Options for fetching tournament statistics.
-   * @returns Query options for fetching tournament statistics.
-   */
-  stats: () =>
-    queryOptions({
-      queryKey: ["tournaments", "stats"],
-      queryFn: async () => fetchTournamentStats(),
-    }),
-  /**
-   * Options for fetching tournament titles.
-   * @returns Query options for fetching tournament titles.
-   */
-  titles: () =>
-    queryOptions({
-      queryKey: ["tournaments", "titles"],
-      queryFn: async () => fetchTournamentNames(),
-    }),
-};
-
-/**
- * Server function to fetch tournament statistics.
- * @returns An object containing the total number of tournaments and total participant slots.  Throws an error if there is a database error.
- */
-export const fetchTournamentStats = createServerFn({ method: "GET" }).handler(
+export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
   async () => {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -75,16 +27,16 @@ export const fetchTournamentStats = createServerFn({ method: "GET" }).handler(
   },
 );
 
-/**
- * Server function to fetch all tournaments.
- * @returns An array of tournaments, ordered by creation date (descending).  Throws an error if there is a database error.
- */
-export const fetchTournaments = createServerFn({ method: "GET" }).handler(
+export const fetchTournamentsFn = createServerFn({ method: "GET" }).handler(
   async () => {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("tournaments")
-      .select("*")
+      .select(`
+        id,
+        title,
+        registration_open
+      `)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -93,22 +45,23 @@ export const fetchTournaments = createServerFn({ method: "GET" }).handler(
   },
 );
 
-/**
- * Server function to fetch a single tournament by ID, including related data.
- * @param id - The ID of the tournament to fetch.
- * @returns A tournament object with creator, participants, brackets, and moderators included. Returns an error if there is a database error.
- */
-export const fetchTournament = createServerFn({ method: "GET" })
+export const fetchTournamentFn = createServerFn({ method: "GET" })
   .validator((d: string) => d)
   .handler(async ({ data: id }) => {
     const supabase = createClient();
 
-    // Fetch tournament data with participants
     const { data: tournamentData, error: tournamentError } = await supabase
       .from("tournaments")
       .select(
         `
-        *,
+        id,
+        creator_id,
+        title,
+        description,
+        max_participants,
+        registration_open,
+        created_at,
+        updated_at,
         profiles (
           id,
           username,
@@ -156,7 +109,6 @@ export const fetchTournament = createServerFn({ method: "GET" })
     const { profiles, tournament_brackets, tournament_participants } =
       tournamentData;
 
-    // Return combined data
     return {
       ...tournamentData,
       creator: profiles,
@@ -166,22 +118,15 @@ export const fetchTournament = createServerFn({ method: "GET" })
     };
   });
 
-/**
- * Server function to add a new tournament.
- * @param data - The data for the new tournament.
- * @returns The newly created tournament object. Throws an error if the data is invalid or if there is a database error.
- */
-export const addTournament = createServerFn({ method: "POST" })
+export const addTournamentFn = createServerFn({ method: "POST" })
   .validator((d: TournamentInsert) => d)
   .handler(async ({ data }) => {
     const supabase = createClient();
 
-    // Validate max_participants
     if (data.max_participants <= 0) {
       throw new Error("max_participants must be a positive number");
     }
 
-    // Insert tournament
     const { data: tournamentData, error } = await supabase
       .from("tournaments")
       .insert({
@@ -198,21 +143,15 @@ export const addTournament = createServerFn({ method: "POST" })
       throw new Error(`Failed to insert tournament: ${error.message}`);
     }
 
-    // Return the inserted tournament
     return {
       ...tournamentData,
-      creator: null, // Creator data can be fetched separately if needed
       tournament_participants: [],
       tournament_brackets: [],
       tournament_moderators: [],
     };
   });
 
-/**
- * Server function to fetch an array of tournament titles.
- * @returns An array of tournament titles.  Throws an error if there is a database error.
- */
-export const fetchTournamentNames = createServerFn({ method: "GET" }).handler(
+export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
   async () => {
     const supabase = createClient();
     const { data, error } = await supabase.from("tournaments").select("title");
