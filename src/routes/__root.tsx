@@ -12,6 +12,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { seo } from "@/utils/seo";
 import { fetchUserFn } from "@/utils/serverFn/auth";
+import type { User } from "@supabase/supabase-js";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
@@ -23,12 +24,14 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Menu, UserIcon } from "lucide-react";
 import TanstackQueryLayout from "../integrations/tanstack-query/layout";
-import TanstackQueryProvider from "../integrations/tanstack-query/provider";
 import appCss from "../styles.css?url";
 
-export const Route = createRootRouteWithContext<{
+interface RouterContext {
   queryClient: QueryClient;
-}>()({
+  user?: User | null;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       {
@@ -40,12 +43,10 @@ export const Route = createRootRouteWithContext<{
       },
       ...seo({
         title: "Bracketopia",
-        description: `Create and manage tournament brackets with ease. Organize
-            competitions, approve participants, and track results all in one
-            place.`,
+        description:
+          "Create and manage tournament brackets with ease. Organize competitions, approve participants, and track results all in one place.",
       }),
     ],
-    // TODO: Add icons
     links: [
       {
         rel: "stylesheet",
@@ -76,12 +77,10 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
-      <TanstackQueryProvider>
-        <Toaster />
-        <Outlet />
-        <TanStackRouterDevtools />
-        <TanstackQueryLayout />
-      </TanstackQueryProvider>
+      <Toaster />
+      <Outlet />
+      <TanStackRouterDevtools />
+      <TanstackQueryLayout />
     </RootDocument>
   );
 }
