@@ -142,9 +142,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                           Profile
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/my-tournaments">My Tournaments</Link>
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/logout">Logout</Link>
@@ -188,9 +185,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                           >
                             Profile
                           </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/my-tournaments">My Tournaments</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>

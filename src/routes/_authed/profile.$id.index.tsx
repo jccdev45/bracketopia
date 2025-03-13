@@ -45,11 +45,6 @@ function RouteComponent() {
               Member since {new Date(profile.created_at).toLocaleDateString()}
             </div>
           </div>
-          {isOwnProfile && (
-            <Button variant="outline" asChild>
-              <Link to="/my-tournaments">My Tournaments</Link>
-            </Button>
-          )}
         </CardHeader>
       </Card>
 
