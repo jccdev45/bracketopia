@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Award, Brackets, Trophy, Users, type LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  Award,
+  Brackets,
+  type LucideIcon,
+  Trophy,
+  Users,
+} from "lucide-react";
 
 interface Feature {
   title: string;
@@ -12,7 +19,8 @@ interface Feature {
 const features: Feature[] = [
   {
     title: "Easy Tournament Creation",
-    description: "Set up your tournament in minutes with our intuitive bracket builder",
+    description:
+      "Set up your tournament in minutes with our intuitive bracket builder",
     icon: Brackets,
   },
   {
@@ -44,8 +52,8 @@ function App() {
       {/* Hero Section */}
       <section className="relative">
         <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-indigo-500/30 via-purple-500/30 to-pink-500/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" 
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-indigo-500/30 via-purple-500/30 to-pink-500/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]"
             aria-hidden="true"
           />
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:radial-gradient(white,transparent_70%)]" />
@@ -59,8 +67,9 @@ function App() {
               BracketOpia
             </h1>
             <p className="mt-6 text-lg leading-8 text-balance text-muted-foreground">
-              Create and manage tournament brackets with ease. Organize competitions,
-              approve participants, and track results all in one place.
+              Create and manage tournament brackets with ease. Organize
+              competitions, approve participants, and track results all in one
+              place.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               {user ? (
@@ -110,7 +119,9 @@ function App() {
               <CardContent className="p-6">
                 <feature.icon className="h-8 w-8 text-primary mb-4 transition-transform group-hover:scale-110" />
                 <h3 className="font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {feature.description}
+                </p>
               </CardContent>
               <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-muted-foreground/10" />
             </Card>
@@ -120,7 +131,7 @@ function App() {
 
       {/* CTA Section */}
       <section className="relative isolate mt-16">
-        <div 
+        <div
           className="absolute inset-0 -z-10 overflow-hidden"
           aria-hidden="true"
         >
@@ -133,7 +144,8 @@ function App() {
               Ready to create your tournament?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join thousands of organizers who trust BracketOpia for their competitions
+              Join thousands of organizers who trust BracketOpia for their
+              competitions
             </p>
             <div className="mt-10">
               {!user && (

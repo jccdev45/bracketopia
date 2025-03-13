@@ -53,7 +53,7 @@ export function TextField({
   const errors = useStore(field.store, (state) => state.meta.errors);
 
   return (
-    <div>
+    <div className="space-y-2">
       {/* previous label style: className="block font-bold mb-1 text-xl" */}
       <Label htmlFor={label} className="grid">
         {label}
@@ -82,9 +82,9 @@ export function TextArea({
   const errors = useStore(field.store, (state) => state.meta.errors);
 
   return (
-    <div>
+    <div className="space-y-2">
       {/* previous label style: className="block font-bold mb-1 text-xl" */}
-      <Label htmlFor={label}>
+      <Label htmlFor={label} className="grid">
         {label}
         <Textarea
           value={field.state.value}
@@ -110,7 +110,7 @@ export function SelectField({
   const errors = useStore(field.store, (state) => state.meta.errors);
 
   return (
-    <div>
+    <div className="grid gap-2">
       {/* previous label style: className="block font-bold mb-1 text-xl" */}
       <Label htmlFor={label}>{label}</Label>
       <select
