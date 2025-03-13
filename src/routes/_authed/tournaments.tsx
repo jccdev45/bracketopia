@@ -1,10 +1,18 @@
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Sidebar,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
+import type { Profile } from "@/types/profile.types";
 import { tournamentQueryOptions } from "@/utils/queries/tournaments";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -13,7 +21,7 @@ import {
   createFileRoute,
   redirect,
 } from "@tanstack/react-router";
-import { CalendarDays, ChevronRight, Users } from "lucide-react";
+import { CalendarDays, User, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authed/tournaments")({
   errorComponent: ({ error }) => {
@@ -47,16 +55,19 @@ function RouteComponent() {
   );
 }
 
-interface SidebarItem {
+interface SidebarTournamentItem {
   id: string;
   title: string;
+  description?: string | null;
+  creator?: Profile;
+  max_participants: number;
   registration_open: boolean;
 }
 
 function TournamentSidebar({
   tournaments,
 }: {
-  tournaments: SidebarItem[];
+  tournaments: SidebarTournamentItem[];
 }) {
   return (
     <>
@@ -65,42 +76,96 @@ function TournamentSidebar({
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
             Tournaments
           </h2>
-          <div className="space-y-1">
+          <Accordion type="multiple">
             {tournaments.map((tournament) => (
-              <Link
-                key={tournament.id}
-                to="/tournaments/$id"
-                params={{ id: tournament.id }}
-                className={cn(
-                  "group flex w-full items-center rounded-md border border-transparent px-4 py-2 hover:bg-muted hover:text-foreground",
-                  {
-                    "bg-muted": false,
-                  },
-                )}
-              >
-                <ChevronRight className="mr-2 h-4 w-4" />
-                <span className="line-clamp-1">{tournament.title}</span>
-              </Link>
+              <AccordionItem key={tournament.id} value={tournament.id}>
+                <AccordionTrigger>
+                  <span className="line-clamp-1 font-semibold">
+                    {tournament.title}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2 divide-y-2">
+                    <p className="grid">
+                      <Label htmlFor="description" className="font-medium">
+                        Description:
+                      </Label>{" "}
+                      <span id="description" className="">
+                        {tournament.description || "No description provided"}
+                      </span>
+                    </p>
+                    <p className="grid">
+                      <Label htmlFor="username" className="font-medium">
+                        Creator:
+                      </Label>{" "}
+                      <span id="username" className="">
+                        {tournament.creator?.username || "Unknown"}
+                      </span>
+                    </p>
+                    <p className="grid">
+                      <Label htmlFor="max_participants" className="font-medium">
+                        Max Participants:
+                      </Label>{" "}
+                      <span id="max_participants" className="">
+                        {tournament.max_participants}
+                      </span>
+                    </p>
+                    <p className="grid">
+                      <Label
+                        htmlFor="registration_open"
+                        className="font-medium"
+                      >
+                        Registration Open:
+                      </Label>{" "}
+                      <span id="registration_open" className="">
+                        {tournament.registration_open ? "Yes" : "No"}
+                      </span>
+                    </p>
+                    <Button asChild variant="link">
+                      <Link
+                        to={"/tournaments/$id"}
+                        params={{
+                          id: tournament.id,
+                        }}
+                        className="w-full rounded-md border px-4 py-2 hover:bg-muted bg-muted/70 transition-all duration-150 ease-in-out hover:text-foreground border-transparent hover:tracking-wide"
+                      >
+                        Details
+                      </Link>
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
             Quick Stats
           </h2>
           <div className="space-y-1">
-            <Button>
+            <Alert>
               <Users className="mr-2 h-4 w-4" />
               <span className="line-clamp-1">
-                {tournaments.length} Tournament{tournaments.length !== 1 && "s"}
+                {tournaments.length}{" "}
+                {tournaments.length === 1 ? "Tournament" : "Tournaments"}
               </span>
-            </Button>
-            <Button>
+            </Alert>
+            <Alert>
               <CalendarDays className="mr-2 h-4 w-4" />
               <span className="line-clamp-1">
-                {tournaments.filter((t) => t.registration_open).length} Open
+                {tournaments.filter((t) => t.registration_open).length} Open{" "}
+                {tournaments.filter((t) => t.registration_open).length === 1
+                  ? "Tournament"
+                  : "Tournaments"}
               </span>
-            </Button>
+            </Alert>
+            <Alert>
+              <User className="mr-2 h-4 w-4" />
+              <span className="line-clamp-1">
+                {tournaments.reduce((sum, t) => sum + t.max_participants, 0)}{" "}
+                Total Slots
+              </span>
+            </Alert>
           </div>
         </div>
       </div>

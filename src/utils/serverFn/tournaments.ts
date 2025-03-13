@@ -32,11 +32,19 @@ export const fetchTournamentsFn = createServerFn({ method: "GET" }).handler(
     const supabase = createClient();
     const { data, error } = await supabase
       .from("tournaments")
-      .select(`
+      .select(
+        `
         id,
         title,
-        registration_open
-      `)
+        registration_open,
+        description,
+        max_participants,
+        profiles (
+          id,
+          username
+        )
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (error) throw error;
