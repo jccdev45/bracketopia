@@ -34,9 +34,6 @@ function RouteComponent() {
         toast.error(ctx?.message || "Signup failed.");
       }
     },
-    onError: (error) => {
-      toast.error(`Network error: ${error.message}`);
-    },
   });
 
   const form = useAppForm({
@@ -94,6 +91,18 @@ function RouteComponent() {
                 return (
                   <field.TextField
                     label="Password"
+                    type="password"
+                    placeholder="******"
+                  />
+                );
+              }}
+            />
+            <form.AppField
+              name="confirmPassword"
+              children={(field) => {
+                return (
+                  <field.TextField
+                    label="Confirm Password"
                     type="password"
                     placeholder="******"
                   />
