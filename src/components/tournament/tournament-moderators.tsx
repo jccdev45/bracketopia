@@ -26,7 +26,7 @@ export function TournamentModerators({
               </Avatar>
               <div>
                 <p className="font-medium">{moderator.profiles?.username}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   @{moderator.profiles?.username}
                 </p>
               </div>

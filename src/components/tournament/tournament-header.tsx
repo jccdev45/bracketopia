@@ -27,7 +27,7 @@ export function TournamentHeader({ tournament }: TournamentHeaderProps) {
               {tournament.creator?.username.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             @{tournament.creator?.username}
           </p>
         </div>

@@ -42,7 +42,7 @@ function RouteComponent() {
 
   return (
     <SidebarProvider>
-      <div className="flex mx-auto container">
+      <div className="container mx-auto flex">
         <Sidebar>
           <TournamentSidebar tournaments={tournaments} />
         </Sidebar>
@@ -73,7 +73,7 @@ function TournamentSidebar({
     <>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          <h2 className="mb-2 px-4 font-semibold text-lg tracking-tight">
             Tournaments
           </h2>
           <Accordion type="multiple">
@@ -127,7 +127,7 @@ function TournamentSidebar({
                         params={{
                           id: tournament.id,
                         }}
-                        className="w-full rounded-md border px-4 py-2 hover:bg-muted bg-muted/70 transition-all duration-150 ease-in-out hover:text-foreground border-transparent hover:tracking-wide"
+                        className="w-full rounded-md border border-transparent bg-muted/70 px-4 py-2 transition-all duration-150 ease-in-out hover:bg-muted hover:text-foreground hover:tracking-wide"
                       >
                         Details
                       </Link>
@@ -139,7 +139,7 @@ function TournamentSidebar({
           </Accordion>
         </div>
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          <h2 className="mb-2 px-4 font-semibold text-lg tracking-tight">
             Quick Stats
           </h2>
           <div className="space-y-1">

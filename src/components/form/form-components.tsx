@@ -35,7 +35,7 @@ function ErrorMessages({
       {errors.map((error) => (
         <div
           key={typeof error === "string" ? error : error.message}
-          className="text-destructive text-sm mt-1 font-bold"
+          className="mt-1 font-bold text-destructive text-sm"
         >
           {typeof error === "string" ? error : error.message}
         </div>
@@ -120,7 +120,7 @@ export function SelectField({
         onChange={(e: { target: { value: Updater<string> } }) =>
           field.handleChange(e.target.value)
         }
-        className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
         {children}
       </select>

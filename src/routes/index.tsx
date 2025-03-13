@@ -16,7 +16,7 @@ function App() {
     <div className="relative isolate">
       {/* Hero Section */}
       <section className="relative bg-primary dark:bg-primary/30">
-        <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="-z-10 absolute inset-0 overflow-hidden">
           <div
             className="absolute inset-0 bg-gradient-to-br from-indigo-300/30 via-purple-300/30 to-pink-300/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]"
             aria-hidden="true"
@@ -25,13 +25,13 @@ function App() {
         </div>
         <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-2xl text-center text-primary-foreground">
-            <div className="flex items-center justify-center mb-6">
-              <Trophy className="h-12 w-12 text-primary-foreground animate-float" />
+            <div className="mb-6 flex items-center justify-center">
+              <Trophy className="h-12 w-12 animate-float text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-gradient-to-r from-violet-300/50 to-violet-600/90 bg-clip-text text-transparent animate-gradient">
+            <h1 className="animate-gradient bg-gradient-to-r from-violet-300/50 to-violet-600/90 bg-clip-text font-bold text-4xl text-transparent tracking-tight sm:text-6xl">
               BracketOpia
             </h1>
-            <p className="mt-6 text-lg leading-8 text-primary-foreground/75">
+            <p className="mt-6 text-lg text-primary-foreground/75 leading-8">
               Create and manage tournament brackets with ease. Organize
               competitions, approve participants, and track results all in one
               place.
@@ -41,7 +41,7 @@ function App() {
                 <Button asChild size="lg" variant="secondary" className="group">
                   <Link to="/tournaments">
                     Browse Tournaments
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 text-accent-foreground" />
+                    <ArrowRight className="ml-2 h-4 w-4 text-accent-foreground transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               ) : (
@@ -56,7 +56,7 @@ function App() {
                       <span className="text-primary-foreground">
                         Get Started
                       </span>
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 text-primary-foreground" />
+                      <ArrowRight className="ml-2 h-4 w-4 text-primary-foreground transition-transform group-hover:translate-x-1" />
                     </Link>
                   </Button>
                   <Button
@@ -79,7 +79,7 @@ function App() {
       {/* Features Section */}
       <section className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-gradient-to-r from-primary/70 to-primary/90 bg-clip-text text-transparent animate-gradient">
+          <h2 className="animate-gradient bg-gradient-to-r from-primary/70 to-primary/90 bg-clip-text font-bold text-3xl text-transparent tracking-tight sm:text-4xl">
             Effortless Tournament Management
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
@@ -91,14 +91,14 @@ function App() {
           {FEATURES.map((feature) => (
             <Card
               key={feature.title}
-              className="hover:bg-muted/50 transition-colors duration-100 ease-in-out"
+              className="transition-colors duration-100 ease-in-out hover:bg-muted/50"
             >
               <CardContent className="p-6">
-                <feature.icon className="h-8 w-8 text-primary mb-4 transition-transform group-hover:scale-110" />
-                <h3 className="font-semibold mb-2 text-foreground">
+                <feature.icon className="mb-4 h-8 w-8 text-primary transition-transform group-hover:scale-110" />
+                <h3 className="mb-2 font-semibold text-foreground">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {feature.description}
                 </p>
               </CardContent>
@@ -110,7 +110,7 @@ function App() {
       {/* CTA Section */}
       <section className="relative isolate mt-16 bg-secondary dark:bg-secondary/10">
         <div
-          className="absolute inset-0 -z-10 overflow-hidden"
+          className="-z-10 absolute inset-0 overflow-hidden"
           aria-hidden="true"
         >
           <div className="absolute inset-0 bg-gradient-to-t from-secondary to-transparent" />
@@ -118,7 +118,7 @@ function App() {
         </div>
         <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-2xl text-center text-secondary-foreground">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl bg-gradient-to-r from-primary/70 to-primary/90 bg-clip-text text-transparent animate-gradient">
+            <h2 className="animate-gradient bg-gradient-to-r from-primary/70 to-primary/90 bg-clip-text font-bold text-3xl text-transparent tracking-tight sm:text-4xl">
               Ready to Get Started?
             </h2>
             <p className="mt-4 text-lg text-secondary-foreground/75">
@@ -129,19 +129,19 @@ function App() {
               <Button
                 asChild
                 size="lg"
-                className="bg-primary text-primary-foreground transition-all duration-200 ease-in-out w-full sm:w-auto group"
+                className="group w-full bg-primary text-primary-foreground transition-all duration-200 ease-in-out sm:w-auto"
               >
                 <Link to="/register">
                   <span className="text-primary-foreground">
                     Create a Tournament Now
                   </span>
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 text-primary-foreground" />
+                  <ArrowRight className="ml-2 h-4 w-4 text-primary-foreground transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="bg-secondary text-secondary-foreground w-full sm:w-auto transition-colors duration-200 ease-in-out"
+                className="w-full bg-secondary text-secondary-foreground transition-colors duration-200 ease-in-out sm:w-auto"
                 asChild
               >
                 <Link to="/login">
@@ -156,7 +156,7 @@ function App() {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="underline text-secondary-foreground/90 hover:text-secondary-foreground transition-colors duration-200 ease-in-out"
+                  className="text-secondary-foreground/90 underline transition-colors duration-200 ease-in-out hover:text-secondary-foreground"
                 >
                   Login
                 </Link>

@@ -58,7 +58,7 @@ export function Login() {
       >
         <Card className="w-full max-w-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-center font-bold text-2xl">
               Login
             </CardTitle>
             <CardDescription className="text-center">

@@ -25,36 +25,36 @@ function RouteComponent() {
   const tournament = Route.useLoaderData();
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex h-full flex-col">
       <div className="border-b">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">{tournament.title}</h1>
+          <div className="mb-4 flex items-center justify-between">
+            <h1 className="font-bold text-2xl">{tournament.title}</h1>
             <Button variant="outline">
               {tournament.registration_open
                 ? "Registration Open"
                 : "Registration Closed"}
             </Button>
           </div>
-          <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+          <div className="flex items-center space-x-6 text-muted-foreground text-sm">
             <div className="flex items-center">
-              <Users className="h-4 w-4 mr-2" />
+              <Users className="mr-2 h-4 w-4" />
               <span>{tournament.max_participants} participants maximum</span>
             </div>
             <div className="flex items-center">
-              <CalendarDays className="h-4 w-4 mr-2" />
+              <CalendarDays className="mr-2 h-4 w-4" />
               <span>
                 Created on{" "}
                 {new Date(tournament.created_at).toLocaleDateString()}
               </span>
             </div>
             <div className="flex items-center">
-              <Trophy className="h-4 w-4 mr-2" />
+              <Trophy className="mr-2 h-4 w-4" />
               <span>Single Elimination</span>
             </div>
           </div>
           {tournament.description && (
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-4 text-muted-foreground text-sm">
               {tournament.description}
             </p>
           )}
@@ -62,7 +62,7 @@ function RouteComponent() {
       </div>
 
       <div className="flex-1 p-6">
-        <Tabs defaultValue="participants" className="h-full flex flex-col">
+        <Tabs defaultValue="participants" className="flex h-full flex-col">
           <TabsList>
             <TabsTrigger value="participants">Participants</TabsTrigger>
             <TabsTrigger value="brackets">Brackets</TabsTrigger>

@@ -55,7 +55,7 @@ export function TournamentBrackets({ brackets, participants }: TournamentBracket
   if (!bracketData && brackets.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <p className="text-muted-foreground mb-4">No brackets have been generated yet.</p>
+        <p className="mb-4 text-muted-foreground">No brackets have been generated yet.</p>
         <Button
           onClick={handleGenerateBracket}
           disabled={participants.length < 2 || generateBracketMutation.isPending}

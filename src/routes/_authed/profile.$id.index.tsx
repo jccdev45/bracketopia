@@ -30,7 +30,7 @@ function RouteComponent() {
   const isOwnProfile = user?.id === profile.id;
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto space-y-8 py-8">
       <Card>
         <CardHeader className="flex flex-row items-center gap-4">
           <Avatar className="h-20 w-20">
@@ -40,8 +40,8 @@ function RouteComponent() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <CardTitle className="text-2xl mb-2">{profile.username}</CardTitle>
-            <div className="text-sm text-muted-foreground">
+            <CardTitle className="mb-2 text-2xl">{profile.username}</CardTitle>
+            <div className="text-muted-foreground text-sm">
               Member since {new Date(profile.created_at).toLocaleDateString()}
             </div>
           </div>
@@ -63,27 +63,27 @@ function RouteComponent() {
                   to="/tournaments/$id"
                   params={{ id: tournament.id }}
                 >
-                  <Card className="hover:bg-muted/50 transition-colors">
+                  <Card className="transition-colors hover:bg-muted/50">
                     <CardContent className="pt-6">
                       <div className="space-y-2">
                         <CardTitle className="line-clamp-1">
                           {tournament.title}
                         </CardTitle>
-                        <div className="text-sm text-muted-foreground space-y-1">
+                        <div className="space-y-1 text-muted-foreground text-sm">
                           <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-2" />
+                            <Users className="mr-2 h-4 w-4" />
                             <span>
                               {tournament.max_participants} participants
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <Trophy className="h-4 w-4 mr-2" />
+                            <Trophy className="mr-2 h-4 w-4" />
                             <span>
                               {tournament.registration_open ? "Open" : "Closed"}
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <CalendarDays className="h-4 w-4 mr-2" />
+                            <CalendarDays className="mr-2 h-4 w-4" />
                             <span>
                               {new Date(
                                 tournament.created_at,
@@ -122,27 +122,27 @@ function RouteComponent() {
                   to="/tournaments/$id"
                   params={{ id: tournament.id }}
                 >
-                  <Card className={cn("hover:bg-muted/50 transition-colors")}>
+                  <Card className={cn("transition-colors hover:bg-muted/50")}>
                     <CardContent className="pt-6">
                       <div className="space-y-2">
                         <CardTitle className="line-clamp-1">
                           {tournament.title}
                         </CardTitle>
-                        <div className="text-sm text-muted-foreground space-y-1">
+                        <div className="space-y-1 text-muted-foreground text-sm">
                           <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-2" />
+                            <Users className="mr-2 h-4 w-4" />
                             <span>
                               {tournament.max_participants} participants
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <Trophy className="h-4 w-4 mr-2" />
+                            <Trophy className="mr-2 h-4 w-4" />
                             <span>
                               {tournament.registration_open ? "Open" : "Closed"}
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <CalendarDays className="h-4 w-4 mr-2" />
+                            <CalendarDays className="mr-2 h-4 w-4" />
                             <span>
                               {new Date(
                                 tournament.created_at,

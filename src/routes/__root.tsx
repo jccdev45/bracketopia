@@ -94,14 +94,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <nav className="bg-white border-b dark:bg-sidebar dark:border-sidebar">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
+        <nav className="border-b bg-white dark:border-sidebar dark:bg-sidebar">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 justify-between">
               <div className="flex">
-                <div className="shrink-0 flex items-center">
+                <div className="flex shrink-0 items-center">
                   <Link
                     to="/"
-                    className="text-xl font-bold text-primary-foreground dark:text-sidebar-primary-foreground"
+                    className="font-bold text-primary-foreground text-xl dark:text-sidebar-primary-foreground"
                   >
                     BracketOpia
                   </Link>
@@ -109,14 +109,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   <Link
                     to="/tournaments"
-                    className="text-gray-500 hover:text-gray-700 dark:text-sidebar-foreground hover:dark:text-sidebar-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent hover:border-gray-300 dark:border-transparent hover:dark:border-sidebar-primary"
+                    className="inline-flex items-center border-transparent border-b-2 px-1 pt-1 font-medium text-gray-500 text-sm hover:border-gray-300 hover:text-gray-700 dark:border-transparent dark:text-sidebar-foreground hover:dark:border-sidebar-primary hover:dark:text-sidebar-primary"
                   >
                     Tournaments
                   </Link>
                   {user && (
                     <Link
                       to="/tournaments/create"
-                      className="text-gray-500 hover:text-gray-700 dark:text-sidebar-foreground hover:dark:text-sidebar-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent hover:border-gray-300 dark:border-transparent hover:dark:border-sidebar-primary"
+                      className="inline-flex items-center border-transparent border-b-2 px-1 pt-1 font-medium text-gray-500 text-sm hover:border-gray-300 hover:text-gray-700 dark:border-transparent dark:text-sidebar-foreground hover:dark:border-sidebar-primary hover:dark:text-sidebar-primary"
                     >
                       Create Tournament
                     </Link>
@@ -140,7 +140,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         <Link
                           to="/profile/$id"
                           params={{ id: user.id }}
-                          className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                          className="text-gray-900 hover:text-gray-700 dark:text-sidebar-primary dark:hover:text-sidebar-primary"
                         >
                           Profile
                         </Link>
@@ -149,7 +149,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                       <DropdownMenuItem asChild>
                         <Link
                           to="/logout"
-                          className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                          className="text-gray-900 hover:text-gray-700 dark:text-sidebar-primary dark:hover:text-sidebar-primary"
                         >
                           Logout
                         </Link>
@@ -161,7 +161,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     <Button variant="outline" asChild>
                       <Link
                         to="/login"
-                        className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                        className="text-gray-900 hover:text-gray-700 dark:text-sidebar-primary dark:hover:text-sidebar-primary"
                       >
                         Login
                       </Link>
@@ -169,7 +169,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     <Button asChild>
                       <Link
                         to="/register"
-                        className="text-gray-900 dark:text-sidebar-primary hover:text-gray-700 dark:hover:text-sidebar-primary"
+                        className="text-gray-900 hover:text-gray-700 dark:text-sidebar-primary dark:hover:text-sidebar-primary"
                       >
                         Register
                       </Link>
