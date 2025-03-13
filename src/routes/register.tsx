@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useAppForm } from "@/hooks/use-app-form";
 import { signupSchema } from "@/schema/auth";
-import { signUpFormOpts } from "@/utils/form-options";
+import { signUpFormOpts } from "@/utils/form/form-options";
 import { signupFn } from "@/utils/serverFn/auth";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";

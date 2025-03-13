@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
-import { seo } from "@/utils/seo";
+import { seo } from "@/utils/config/seo";
 import { fetchUserFn } from "@/utils/serverFn/auth";
 import type { User } from "@supabase/supabase-js";
 import type { QueryClient } from "@tanstack/react-query";

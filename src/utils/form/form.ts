@@ -1,4 +1,4 @@
-import { authFormOpts } from "@/utils/form-options";
+import { authFormOpts } from "@/utils/form/form-options";
 import {
   ServerValidateError,
   createServerValidate,
