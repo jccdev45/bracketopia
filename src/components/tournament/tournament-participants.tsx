@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { TournamentParticipant } from "@/types/tournament.types";
+import type { TournamentParticipantWithProfile } from "@/types/tournament.types";
 
 interface TournamentParticipantsProps {
-  participants?: TournamentParticipant[];
+  participants?: TournamentParticipantWithProfile[];
 }
 
 export function TournamentParticipants({

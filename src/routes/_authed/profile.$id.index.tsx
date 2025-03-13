@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { fetchProfile, fetchUserTournaments } from "@/utils/serverFn/profiles";
+import {
+  fetchProfileFn,
+  fetchUserTournamentsFn,
+} from "@/utils/serverFn/profiles";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { CalendarDays, Trophy, Users } from "lucide-react";
 
@@ -11,8 +14,8 @@ export const Route = createFileRoute("/_authed/profile/$id/")({
   component: RouteComponent,
   loader: async ({ params: { id } }) => {
     const [profile, tournaments] = await Promise.all([
-      fetchProfile({ data: id }),
-      fetchUserTournaments({ data: id }),
+      fetchProfileFn({ data: id }),
+      fetchUserTournamentsFn({ data: id }),
     ]);
     return { profile, tournaments };
   },

@@ -1,4 +1,4 @@
-import { fetchParticipantsWithProfiles } from "@/utils/serverFn/participants";
+import { fetchParticipantsWithProfilesFn } from "@/utils/serverFn/participants";
 import { queryOptions } from "@tanstack/react-query";
 
 export const participantsQueryOptions = {
@@ -6,6 +6,6 @@ export const participantsQueryOptions = {
     queryOptions({
       queryKey: ["participants", tournamentId],
       queryFn: async () =>
-        fetchParticipantsWithProfiles({ data: tournamentId }),
+        fetchParticipantsWithProfilesFn({ data: tournamentId }),
     }),
 };

@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchTournamentStats } from "@/utils/serverFn/tournaments";
+import { fetchTournamentStatsFn } from "@/utils/serverFn/tournaments";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Trophy, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authed/tournaments/")({
   component: RouteComponent,
-  loader: () => fetchTournamentStats(),
+  loader: () => fetchTournamentStatsFn(),
 });
 
 function RouteComponent() {

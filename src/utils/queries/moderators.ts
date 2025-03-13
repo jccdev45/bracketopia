@@ -1,4 +1,4 @@
-import { fetchModeratorsWithProfiles } from "@/utils/serverFn/moderators";
+import { fetchModeratorsWithProfilesFn } from "@/utils/serverFn/moderators";
 import { queryOptions } from "@tanstack/react-query";
 
 export const moderatorQueryOptions = {
@@ -6,7 +6,7 @@ export const moderatorQueryOptions = {
     queryOptions({
       queryKey: ["tournament-moderators", tournamentId],
       queryFn: () =>
-        fetchModeratorsWithProfiles({
+        fetchModeratorsWithProfilesFn({
           data: tournamentId,
         }),
     }),
