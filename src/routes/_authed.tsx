@@ -1,21 +1,16 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Login } from "@/components/form/login";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed")({
-  beforeLoad: ({ context }) => {
-    if (!context.user) {
-      throw redirect({
-        to: "/login",
-        search: {
-          redirect: location.href,
-        },
-      });
-    }
-  },
-  errorComponent: ({ error }) => {
-    if (error.message === "Not authenticated") {
-      redirect({ to: "/login" });
-    }
-
-    throw error;
-  },
+  component: AuthedComponent,
 });
+
+function AuthedComponent() {
+  const { user } = Route.useRouteContext();
+
+  if (user) {
+    return <Outlet />;
+  }
+
+  return <Login />;
+}
