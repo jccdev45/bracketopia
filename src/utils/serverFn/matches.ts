@@ -1,10 +1,7 @@
 import { createClient } from "@/integrations/supabase/server";
-import type { UpdateMatchResultParams } from "@/types/bracket.types";
+import type { UpdateMatchResultParams } from "@/types/tournament.types";
 import { createServerFn } from "@tanstack/react-start";
 
-/**
- * Updates a match result and advances the winner
- */
 export const updateMatchResultFn = createServerFn({ method: "POST" })
   .validator((d: UpdateMatchResultParams) => d)
   .handler(
@@ -62,7 +59,9 @@ export const updateMatchResultFn = createServerFn({ method: "POST" })
           .eq("round", match.round + 1);
 
         if (nextMatchError) {
-          throw new Error(`Failed to update next match: ${nextMatchError.message}`);
+          throw new Error(
+            `Failed to update next match: ${nextMatchError.message}`,
+          );
         }
 
         return { success: true };

@@ -1,67 +1,19 @@
+// src/types/tournament.types.ts
 import type {
-  Json,
   Tables,
   TablesInsert,
   TablesUpdate,
 } from "@/integrations/supabase/generated.types";
 import type { Profile } from "@/types/profile.types";
 
-// Explicit enum for match status
-export type MatchStatus = "pending" | "completed" | "cancelled";
-
-// Type for tournament participants
-export type TournamentParticipant = Tables<"tournament_participants">;
-export type TournamentParticipantWithProfile = TournamentParticipant & {
-  profiles?: Profile | null;
-};
-
-// Type for tournament moderators
-export type TournamentModerator = Tables<"tournament_moderators">;
-export type TournamentModeratorWithProfiles = TournamentModerator & {
-  profiles?: Profile | null;
-};
-
-// Type for tournament matches
-export type TournamentMatch = Tables<"tournament_matches"> & {
-  participant1?: Pick<TournamentParticipantWithProfile, "id"> | null;
-  participant2?: Pick<TournamentParticipantWithProfile, "id"> | null;
-  winner?: Pick<TournamentParticipantWithProfile, "id"> | null;
-};
-
-// Type for tournament brackets
-export type TournamentBracket = Omit<
-  Tables<"tournament_brackets">,
-  "structure"
-> & {
-  structure: Structure;
-};
-
-// Type for tournament structure
-export interface Structure {
-  rounds: number;
-  matches: TournamentMatch[];
-}
-
-// Type for tournaments
+// Base types from Supabase
 export type Tournament = Tables<"tournaments">;
+export type TournamentParticipant = Tables<"tournament_participants">;
+export type TournamentModerator = Tables<"tournament_moderators">;
+export type TournamentMatch = Tables<"tournament_matches">;
+export type TournamentBracket = Tables<"tournament_brackets">;
 
-export type TournamentWithDetails = Tournament & {
-  creator: Profile | null;
-  tournament_participants:
-    | TournamentParticipant[]
-    | TournamentParticipantWithProfile[];
-  tournament_brackets: TournamentBracket[];
-  tournament_moderators:
-    | TournamentModerator[]
-    | TournamentModeratorWithProfiles[];
-};
-
-export interface TournamentStats {
-  totalTournaments: number;
-  totalParticipantSlots: number;
-}
-
-// Insert types
+// --- Insert types (for creating new records)
 export type TournamentInsert = TablesInsert<"tournaments">;
 export type TournamentParticipantInsert =
   TablesInsert<"tournament_participants">;
@@ -69,7 +21,7 @@ export type TournamentModeratorInsert = TablesInsert<"tournament_moderators">;
 export type TournamentBracketInsert = TablesInsert<"tournament_brackets">;
 export type TournamentMatchInsert = TablesInsert<"tournament_matches">;
 
-// Update types
+// --- Update types (for modifying existing records)
 export type TournamentUpdate = TablesUpdate<"tournaments">;
 export type TournamentParticipantUpdate =
   TablesUpdate<"tournament_participants">;
@@ -77,55 +29,78 @@ export type TournamentModeratorUpdate = TablesUpdate<"tournament_moderators">;
 export type TournamentBracketUpdate = TablesUpdate<"tournament_brackets">;
 export type TournamentMatchUpdate = TablesUpdate<"tournament_matches">;
 
-// Custom types for JSON columns
-export type CustomJson = {
-  [key: string]: Json | undefined;
+// --- Combined Types (for fetching with relationships) ---
+
+// A participant with their profile data.
+export type TournamentParticipantWithProfile = TournamentParticipant & {
+  profiles: Profile;
 };
 
-// Override types for JSON columns
-export type OverrideJson<T> = T & {
-  structure: CustomJson;
+// A moderator with their profile data.
+export type TournamentModeratorWithProfile = TournamentModerator & {
+  profiles: Profile;
 };
 
-// Example usage of override types
-export type OverrideTournamentBracket = OverrideJson<TournamentBracket>;
-
-// Utility types for query results
-export type QueryResult<T> = {
-  data: T | null;
-  error: Error | null;
+// A match with participant and winner data (potentially).
+export type TournamentMatchWithParticipants = TournamentMatch & {
+  participant1: TournamentParticipantWithProfile | null;
+  participant2: TournamentParticipantWithProfile | null;
+  winner: TournamentParticipantWithProfile | null;
 };
 
-{
-  /*
-// Example utility function for fetching tournaments
-export async function fetchTournaments(): Promise<QueryResult<Tournament[]>> {
-  // Implementation here
-  return { data: null, error: null };
+// A bracket with its structured data.  We parse the JSON.
+export type TournamentBracketWithStructure = Omit<
+  TournamentBracket,
+  "structure"
+> & {
+  structure: BracketStructure;
+};
+
+// A fully loaded tournament with all related data.
+export type TournamentWithDetails = Tournament & {
+  creator: Profile; // Use existing Profile
+  tournament_participants: TournamentParticipantWithProfile[];
+  tournament_brackets: TournamentBracketWithStructure[];
+  tournament_moderators: TournamentModeratorWithProfile[];
+};
+
+// --- Bracket Structure (this is the JSON shape) ---
+// It makes sense to define this *here*, since it's specific to how you store
+// the bracket data in Supabase.
+export interface BracketStructure {
+  rounds: number;
+  matches: Array<{
+    match_number: number;
+    round: number;
+    participant1_id: string | null;
+    participant2_id: string | null;
+    status: MatchStatus;
+  }>;
 }
 
-// Example utility function for inserting a tournament
-export async function insertTournament(
-  tournament: TournamentInsert
-): Promise<QueryResult<Tournament>> {
-  // Implementation here
-  return { data: null, error: null };
+// --- Other useful types ---
+
+// Type for match status
+export type MatchStatus = "pending" | "completed" | "cancelled";
+
+// Example of a utility type: params for fetching a bracket
+export interface FetchBracketParams {
+  tournamentId: string;
+}
+export interface GenerateBracketParams {
+  tournamentId: string;
+  participants: Array<Pick<TournamentParticipant, "id" | "user_id">>;
 }
 
-// Example utility function for updating a tournament
-export async function updateTournament(
-  id: string,
-  updates: TournamentUpdate
-): Promise<QueryResult<Tournament>> {
-  // Implementation here
-  return { data: null, error: null };
+export interface UpdateMatchResultParams {
+  tournamentId: string;
+  matchId: string;
+  score1: number;
+  score2: number;
+  winnerId: string;
 }
 
-// Example utility function for deleting a tournament
-export async function deleteTournament(id: string): Promise<QueryResult<void>> {
-  // Implementation here
-  return { data: null, error: null };
-}
-*/
-  // biome-ignore lint/complexity/noUselessLoneBlockStatements: <shhhhh>
+export interface TournamentStats {
+  totalTournaments: number;
+  totalParticipantSlots: number;
 }

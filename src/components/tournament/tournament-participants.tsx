@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -33,7 +34,10 @@ export function TournamentParticipants({
           <TableBody>
             {participants?.map((participant) => (
               <TableRow key={participant.id}>
-                <TableCell>{participant.status}</TableCell>
+                <TableCell>{participant.profiles.username}</TableCell>
+                <TableCell>
+                  <Badge>{participant.status}</Badge>
+                </TableCell>
                 <TableCell>{participant.seed || "N/A"}</TableCell>
               </TableRow>
             ))}

@@ -1,3 +1,4 @@
+// src/components/tournament/tournament-brackets.tsx
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -52,17 +53,6 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
         participants: participants.map((p) => ({
           id: p.id,
           user_id: p.user_id,
-        })),
-        matches: participants.map(() => ({
-          id: "",
-          tournament_id: tournamentId,
-          round: 0,
-          match_number: 0,
-          score1: 0,
-          score2: 0,
-          winner_id: "",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
         })),
       },
     });

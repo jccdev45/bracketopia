@@ -1,10 +1,11 @@
 import { createClient } from "@/integrations/supabase/server";
 import type {
-  Structure,
   TournamentInsert,
+  TournamentModeratorWithProfile,
+  TournamentParticipantWithProfile,
   TournamentStats,
-  TournamentWithDetails,
 } from "@/types/tournament.types";
+import { parseStructure } from "@/utils/helpers/brackets";
 import { createServerFn } from "@tanstack/react-start";
 // NOTE: for temp function
 // import { faker } from "@snaplet/copycat";
@@ -100,8 +101,8 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
           id,
           username,
           avatar_url,
-          updated_at,
-          created_at
+          created_at,
+          updated_at
         ),
         tournament_participants (
           id,
@@ -110,7 +111,14 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
           created_at,
           seed,
           status,
-          updated_at
+          updated_at,
+          profiles!inner (
+            id,
+            username,
+            avatar_url,
+            created_at,
+            updated_at
+          )
         ),
         tournament_brackets (
           id,
@@ -119,21 +127,24 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
           current_round,
           created_at,
           updated_at
+        ),
+         tournament_moderators (
+          id,
+          user_id,
+          tournament_id,
+          created_at,
+          profiles!inner (
+            id,
+            username,
+            avatar_url,
+            created_at,
+            updated_at
+          )
         )
       `,
       )
       .eq("id", id)
-      .single()
-      .overrideTypes<{
-        tournament_brackets: {
-          structure: Structure;
-          id: string;
-          tournament_id: string;
-          created_at: string;
-          updated_at: string;
-          current_round: number | null;
-        };
-      }>();
+      .single();
 
     if (tournamentError) {
       console.error("Supabase error: ", tournamentError);
@@ -143,15 +154,34 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
       );
     }
 
-    const { profiles, tournament_brackets, tournament_participants } =
-      tournamentData;
+    // Handle the case where no tournament is found.
+    if (!tournamentData) {
+      throw new TournamentError(
+        "Tournament not found.",
+        "TOURNAMENT_NOT_FOUND",
+      );
+    }
 
-    const formattedTournamentData: TournamentWithDetails = {
+    const {
+      profiles,
+      tournament_brackets,
+      tournament_participants,
+      tournament_moderators,
+    } = tournamentData;
+
+    const formattedTournamentData = {
       ...tournamentData,
       creator: profiles,
-      tournament_brackets: tournament_brackets ? [tournament_brackets] : [],
-      tournament_participants: tournament_participants || [], // if possible for this to be undefined or null
-      tournament_moderators: [],
+      tournament_brackets: Array.isArray(tournament_brackets)
+        ? tournament_brackets.map((bracket) => ({
+            ...bracket,
+            structure: parseStructure(bracket.structure),
+          }))
+        : [],
+      tournament_participants:
+        (tournament_participants as TournamentParticipantWithProfile[]) || [],
+      tournament_moderators:
+        (tournament_moderators as TournamentModeratorWithProfile[]) || [],
     };
 
     return formattedTournamentData;

@@ -1,5 +1,8 @@
 import type { Tables } from "@/integrations/supabase/generated.types";
-import type { BracketStructure } from "@/types/bracket.types";
+import type {
+  BracketStructure,
+  TournamentParticipant,
+} from "@/types/tournament.types";
 
 /**
  * Type guard to check if a value is a BracketStructure
@@ -48,8 +51,13 @@ export const calculateTournamentStructure = (
  * Creates first round matches from participants
  */
 export const createFirstRoundMatches = (
-  participants: Array<Pick<Tables<"tournament_participants">, "id" | "user_id">>,
-): Array<Pick<Tables<"tournament_matches">, "match_number" | "participant1_id" | "participant2_id" | "round" | "status">> => {
+  participants: Array<Pick<TournamentParticipant, "id" | "user_id">>,
+): Array<
+  Pick<
+    Tables<"tournament_matches">,
+    "match_number" | "participant1_id" | "participant2_id" | "round" | "status"
+  >
+> => {
   const matches = [];
   for (let i = 0; i < participants.length; i += 2) {
     const participant1 = participants[i] || null;
@@ -72,7 +80,12 @@ export const createFirstRoundMatches = (
 export const createFutureRoundMatches = (
   numRounds: number,
   startingMatchNumber: number,
-): Array<Pick<Tables<"tournament_matches">, "match_number" | "participant1_id" | "participant2_id" | "round" | "status">> => {
+): Array<
+  Pick<
+    Tables<"tournament_matches">,
+    "match_number" | "participant1_id" | "participant2_id" | "round" | "status"
+  >
+> => {
   const matches = [];
   let currentMatchNumber = startingMatchNumber;
 

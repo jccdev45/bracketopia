@@ -1,9 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TournamentModeratorWithProfiles } from "@/types/tournament.types";
+import type { TournamentModeratorWithProfile } from "@/types/tournament.types";
 
 interface TournamentModeratorsProps {
-  moderators: TournamentModeratorWithProfiles[];
+  moderators: TournamentModeratorWithProfile[];
 }
 
 export function TournamentModerators({
