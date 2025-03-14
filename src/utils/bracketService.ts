@@ -4,13 +4,13 @@ import type {
   TournamentBracket,
   TournamentBracketInsert,
   TournamentMatch,
-  TournamentParticipant,
+  TournamentParticipantWithProfile,
 } from "@/types/tournament.types";
 import { createServerFn } from "@tanstack/react-start";
 
 interface GenerateBracketParams {
   tournamentId: string;
-  participants: Pick<TournamentParticipant, "id" | "user_id">[];
+  participants: Pick<TournamentParticipantWithProfile, "id" | "user_id">[];
 }
 
 interface UpdateMatchResultParams {
@@ -33,7 +33,8 @@ interface BracketMatch {
   participant2_id: string | null;
 }
 
-export interface BracketMatchWithParticipants extends Omit<TournamentMatch, "participant1" | "participant2" | "winner"> {
+export interface BracketMatchWithParticipants
+  extends Omit<TournamentMatch, "participant1" | "participant2" | "winner"> {
   participant1: { id: string; user: { id: string; username: string } } | null;
   participant2: { id: string; user: { id: string; username: string } } | null;
   winner: { id: string; user: { id: string; username: string } } | null;
@@ -103,7 +104,7 @@ const calculateTournamentStructure = (
  * Creates first round matches from participants
  */
 const createFirstRoundMatches = (
-  participants: Pick<TournamentParticipant, "id" | "user_id">[],
+  participants: Pick<TournamentParticipantWithProfile, "id" | "user_id">[],
 ): BracketMatch[] => {
   const matches: BracketMatch[] = [];
   for (let i = 0; i < participants.length; i += 2) {
@@ -151,72 +152,80 @@ const createFutureRoundMatches = (
  */
 export const generateBracket = createServerFn({ method: "POST" })
   .validator((d: GenerateBracketParams) => d)
-  .handler(async ({ data: { tournamentId, participants } }): Promise<TournamentBracket> => {
-    const supabase = createClient();
-    const shuffledParticipants = shuffleParticipants(participants);
-    const { numRounds } = calculateTournamentStructure(participants.length);
+  .handler(
+    async ({
+      data: { tournamentId, participants },
+    }): Promise<TournamentBracket> => {
+      const supabase = createClient();
+      const shuffledParticipants = shuffleParticipants(participants);
+      const { numRounds } = calculateTournamentStructure(participants.length);
 
-    const firstRoundMatches = createFirstRoundMatches(shuffledParticipants);
-    const futureRoundMatches = createFutureRoundMatches(
-      numRounds,
-      firstRoundMatches.length + 1,
-    );
+      const firstRoundMatches = createFirstRoundMatches(shuffledParticipants);
+      const futureRoundMatches = createFutureRoundMatches(
+        numRounds,
+        firstRoundMatches.length + 1,
+      );
 
-    const matches = [...firstRoundMatches, ...futureRoundMatches];
-    const structure = {
-      rounds: numRounds,
-      matches,
-    };
-
-    try {
-      const { data: bracketData, error: bracketError } = await supabase
-        .from("tournament_brackets")
-        .insert({
-          tournament_id: tournamentId,
-          structure: JSON.stringify(structure),
-          current_round: 1,
-        } satisfies TournamentBracketInsert)
-        .select()
-        .single();
-
-      if (bracketError || !bracketData) {
-        throw new Error(bracketError?.message ?? "Failed to create tournament bracket");
-      }
-
-      const { error: matchError } = await supabase
-        .from("tournament_matches")
-        .insert(
-          matches.map((match) => ({
-            ...match,
-            tournament_id: tournamentId,
-            bracket_id: bracketData.id,
-          })),
-        );
-
-      if (matchError) {
-        throw new Error(matchError.message);
-      }
-
-      return {
-        id: bracketData.id,
-        tournament_id: bracketData.tournament_id,
-        created_at: bracketData.created_at,
-        updated_at: bracketData.updated_at,
-        current_round: bracketData.current_round,
-        structure: parseStructure(JSON.parse(bracketData.structure as string)),
+      const matches = [...firstRoundMatches, ...futureRoundMatches];
+      const structure = {
+        rounds: numRounds,
+        matches,
       };
-    } catch (error) {
-      console.error("Error generating bracket:", error);
-      throw error;
-    }
-  });
+
+      try {
+        const { data: bracketData, error: bracketError } = await supabase
+          .from("tournament_brackets")
+          .insert({
+            tournament_id: tournamentId,
+            structure: JSON.stringify(structure),
+            current_round: 1,
+          } satisfies TournamentBracketInsert)
+          .select()
+          .single();
+
+        if (bracketError || !bracketData) {
+          throw new Error(
+            bracketError?.message ?? "Failed to create tournament bracket",
+          );
+        }
+
+        const { error: matchError } = await supabase
+          .from("tournament_matches")
+          .insert(
+            matches.map((match) => ({
+              ...match,
+              tournament_id: tournamentId,
+              bracket_id: bracketData.id,
+            })),
+          );
+
+        if (matchError) {
+          throw new Error(matchError.message);
+        }
+
+        return {
+          id: bracketData.id,
+          tournament_id: bracketData.tournament_id,
+          created_at: bracketData.created_at,
+          updated_at: bracketData.updated_at,
+          current_round: bracketData.current_round,
+          structure: parseStructure(
+            JSON.parse(bracketData.structure as string),
+          ),
+        };
+      } catch (error) {
+        console.error("Error generating bracket:", error);
+        throw error;
+      }
+    },
+  );
 
 /**
  * Fetches bracket data for a tournament
  */
 export const fetchBracket = createServerFn({ method: "GET" })
   .validator((d: FetchBracketParams) => d)
-  .handler(async ({ data: { tournamentId } }): Promise<BracketData | null> => {
+  .handler(async ({ data: { tournamentId } }) => {
     const supabase = createClient();
     try {
       const { data: bracketData } = await supabase
@@ -250,7 +259,9 @@ export const fetchBracket = createServerFn({ method: "GET" })
         .order("match_number", { ascending: true })
         .throwOnError();
 
-      const structure = parseStructure(JSON.parse(bracketData.structure as string));
+      const structure = parseStructure(
+        JSON.parse(bracketData.structure as string),
+      );
 
       return {
         id: bracketData.id,
@@ -272,48 +283,52 @@ export const fetchBracket = createServerFn({ method: "GET" })
  */
 export const updateMatchResult = createServerFn({ method: "POST" })
   .validator((d: UpdateMatchResultParams) => d)
-  .handler(async ({ data: { matchId, score1, score2, winnerId } }): Promise<TournamentMatch> => {
-    const supabase = createClient();
-    try {
-      const { data: matchData } = await supabase
-        .from("tournament_matches")
-        .update({
-          score_participant1: score1,
-          score_participant2: score2,
-          winner_id: winnerId,
-          status: "completed" as const,
-        } satisfies Partial<TournamentMatch>)
-        .eq("id", matchId)
-        .select("*, round, match_number")
-        .single()
-        .throwOnError();
-
-      if (matchData) {
-        const { data: nextMatch } = await supabase
+  .handler(
+    async ({
+      data: { matchId, score1, score2, winnerId },
+    }): Promise<TournamentMatch> => {
+      const supabase = createClient();
+      try {
+        const { data: matchData } = await supabase
           .from("tournament_matches")
-          .select("*")
-          .eq("tournament_id", matchData.tournament_id)
-          .eq("round", matchData.round + 1)
-          .eq("match_number", Math.ceil(matchData.match_number / 2))
-          .single();
+          .update({
+            score_participant1: score1,
+            score_participant2: score2,
+            winner_id: winnerId,
+            status: "completed" as const,
+          } satisfies Partial<TournamentMatch>)
+          .eq("id", matchId)
+          .select("*, round, match_number")
+          .single()
+          .throwOnError();
 
-        if (nextMatch) {
-          const isFirstParticipant = matchData.match_number % 2 !== 0;
-          const updateField = isFirstParticipant
-            ? "participant1_id"
-            : "participant2_id";
-
-          await supabase
+        if (matchData) {
+          const { data: nextMatch } = await supabase
             .from("tournament_matches")
-            .update({ [updateField]: winnerId })
-            .eq("id", nextMatch.id)
-            .throwOnError();
-        }
-      }
+            .select("*")
+            .eq("tournament_id", matchData.tournament_id)
+            .eq("round", matchData.round + 1)
+            .eq("match_number", Math.ceil(matchData.match_number / 2))
+            .single();
 
-      return matchData;
-    } catch (error) {
-      console.error("Error updating match result:", error);
-      throw error;
-    }
-  });
+          if (nextMatch) {
+            const isFirstParticipant = matchData.match_number % 2 !== 0;
+            const updateField = isFirstParticipant
+              ? "participant1_id"
+              : "participant2_id";
+
+            await supabase
+              .from("tournament_matches")
+              .update({ [updateField]: winnerId })
+              .eq("id", nextMatch.id)
+              .throwOnError();
+          }
+        }
+
+        return matchData;
+      } catch (error) {
+        console.error("Error updating match result:", error);
+        throw error;
+      }
+    },
+  );
