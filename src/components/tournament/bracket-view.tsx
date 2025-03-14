@@ -1,13 +1,34 @@
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type {
   BracketData,
   BracketMatchWithParticipants,
-} from "@/utils/bracketService";
+  ParticipantWithUser,
+} from "@/types/bracket.types";
 
 interface BracketViewProps {
   bracket: BracketData;
   onUpdateMatch?: (matchId: string, winnerId: string) => void;
 }
+
+const isValidParticipant = (
+  participant: ParticipantWithUser | null,
+): participant is ParticipantWithUser => {
+  return participant !== null && typeof participant.id === "string";
+};
+
+const isValidMatchForUpdate = (
+  match: BracketMatchWithParticipants,
+): match is BracketMatchWithParticipants & {
+  participant1: ParticipantWithUser;
+  participant2: ParticipantWithUser;
+} => {
+  return (
+    match.status === "pending" &&
+    isValidParticipant(match.participant1) &&
+    isValidParticipant(match.participant2)
+  );
+};
 
 export function BracketView({ bracket, onUpdateMatch }: BracketViewProps) {
   const matchesByRound = bracket.matches.reduce<
@@ -21,49 +42,48 @@ export function BracketView({ bracket, onUpdateMatch }: BracketViewProps) {
   }, {});
 
   return (
-    <div className="flex gap-8 overflow-x-auto p-4">
+    <div className="flex gap-12 overflow-x-auto p-6">
       {Array.from({ length: bracket.structure.rounds }, (_, i) => i + 1).map(
         (round) => (
-          <div key={round} className="flex flex-col gap-4">
-            <h3 className="font-semibold text-muted-foreground text-sm">
+          <div key={round} className="flex flex-col gap-8">
+            <h3 className="font-semibold text-lg text-muted-foreground">
               Round {round}
             </h3>
             <div
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-8"
               style={{
-                marginTop: `${2 ** (round - 1) * 1}rem`,
-                marginBottom: `${2 ** (round - 1) * 1}rem`,
+                marginTop: round > 1 ? `${2 ** (round - 2) * 2}rem` : "0",
               }}
             >
-              {matchesByRound[round]?.map((match) => (
-                <div
+              {(matchesByRound[round] || []).map((match) => (
+                <Card
                   key={match.id}
-                  className="relative w-64 rounded-lg border p-4"
-                  style={{
-                    marginTop: `${2 ** (round - 1) * 1}rem`,
-                    marginBottom: `${2 ** (round - 1) * 1}rem`,
-                  }}
+                  className={`relative w-72 p-4 shadow-md transition-all hover:shadow-lg ${
+                    match.status === "completed" ? "bg-muted/10" : ""
+                  }`}
                 >
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     <div
-                      className={`flex items-center justify-between ${
+                      className={`flex items-center justify-between rounded-sm p-2 ${
                         match.winner?.id === match.participant1?.id
-                          ? "text-green-600 dark:text-green-400"
-                          : ""
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : match.status === "completed"
+                            ? "text-muted-foreground"
+                            : "hover:bg-muted/50"
                       }`}
                     >
-                      <span className="truncate">
-                        {match.participant1?.user.username || "TBD"}
+                      <span className="truncate font-medium">
+                        {match.participant1?.user?.username ?? "TBD"}
                       </span>
-                      <span>{match.score_participant1 ?? "-"}</span>
-                      {match.status === "pending" &&
-                        match.participant1?.id !== null &&
-                        match.participant1?.id !== undefined &&
-                        match.participant2?.id !== null &&
-                        match.participant2?.id !== undefined && (
+                      <div className="flex items-center gap-2">
+                        <span className="tabular-nums">
+                          {match.score_participant1 ?? "-"}
+                        </span>
+                        {isValidMatchForUpdate(match) && (
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="h-7 px-2"
                             onClick={() =>
                               onUpdateMatch?.(match.id, match.participant1.id)
                             }
@@ -71,27 +91,30 @@ export function BracketView({ bracket, onUpdateMatch }: BracketViewProps) {
                             Win
                           </Button>
                         )}
+                      </div>
                     </div>
                     <div className="h-px bg-border" />
                     <div
-                      className={`flex items-center justify-between ${
+                      className={`flex items-center justify-between rounded-sm p-2 ${
                         match.winner?.id === match.participant2?.id
-                          ? "text-green-600 dark:text-green-400"
-                          : ""
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : match.status === "completed"
+                            ? "text-muted-foreground"
+                            : "hover:bg-muted/50"
                       }`}
                     >
-                      <span className="truncate">
-                        {match.participant2?.user.username || "TBD"}
+                      <span className="truncate font-medium">
+                        {match.participant2?.user?.username ?? "TBD"}
                       </span>
-                      <span>{match.score_participant2 ?? "-"}</span>
-                      {match.status === "pending" &&
-                        match.participant1?.id !== null &&
-                        match.participant1?.id !== undefined &&
-                        match.participant2?.id !== null &&
-                        match.participant2?.id !== undefined && (
+                      <div className="flex items-center gap-2">
+                        <span className="tabular-nums">
+                          {match.score_participant2 ?? "-"}
+                        </span>
+                        {isValidMatchForUpdate(match) && (
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="h-7 px-2"
                             onClick={() =>
                               onUpdateMatch?.(match.id, match.participant2.id)
                             }
@@ -99,9 +122,10 @@ export function BracketView({ bracket, onUpdateMatch }: BracketViewProps) {
                             Win
                           </Button>
                         )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           </div>

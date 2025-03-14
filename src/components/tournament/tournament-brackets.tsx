@@ -1,66 +1,131 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { TournamentBracket } from "@/types/tournament.types";
-import { fetchBracket, generateBracket, updateMatchResult } from "@/utils/bracketService";
-import { useParams } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  bracketMutationOptions,
+  bracketQueryOptions,
+} from "@/utils/queries/brackets";
+import { participantsQueryOptions } from "@/utils/queries/participants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BracketView } from "./bracket-view";
 
 interface TournamentBracketsProps {
-  brackets: TournamentBracket[];
-  participants: { id: string; user_id: string }[];
+  tournamentId: string;
 }
 
-export function TournamentBrackets({ brackets, participants }: TournamentBracketsProps) {
-  const { id: tournamentId } = useParams({ from: "/_authed/tournaments/$id" });
+export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
   const queryClient = useQueryClient();
 
-  const { data: bracketData } = useQuery({
-    queryKey: ["bracket", tournamentId],
-    queryFn: () => fetchBracket({ data: { tournamentId } }),
-    enabled: brackets.length > 0,
+  const {
+    data: bracketData,
+    isLoading: isBracketLoading,
+    isError: isBracketError,
+  } = useQuery({
+    ...bracketQueryOptions.list(tournamentId),
+  });
+
+  const {
+    data: participants = [],
+    isLoading: isParticipantsLoading,
+    isError: isParticipantsError,
+  } = useQuery({
+    ...participantsQueryOptions.list(tournamentId),
   });
 
   const generateBracketMutation = useMutation({
-    mutationFn: () => generateBracket({ data: { tournamentId, participants } }),
+    ...bracketMutationOptions.generate(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bracket", tournamentId] });
+      queryClient.invalidateQueries({ queryKey: ["brackets", tournamentId] });
     },
   });
 
   const updateMatchMutation = useMutation({
-    mutationFn: ({ matchId, winnerId }: { matchId: string; winnerId: string }) =>
-      updateMatchResult({
-        data: {
-          tournamentId,
-          matchId,
-          score1: 1,
-          score2: 0,
-          winnerId,
-        },
-      }),
+    ...bracketMutationOptions.updateMatch(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bracket", tournamentId] });
+      queryClient.invalidateQueries({ queryKey: ["brackets", tournamentId] });
     },
   });
 
   const handleGenerateBracket = () => {
-    generateBracketMutation.mutate();
+    generateBracketMutation.mutate({
+      data: {
+        tournamentId,
+        participants: participants.map((p) => ({
+          id: p.id,
+          user_id: p.user_id,
+        })),
+        matches: participants.map(() => ({
+          id: "",
+          tournament_id: tournamentId,
+          round: 0,
+          match_number: 0,
+          score1: 0,
+          score2: 0,
+          winner_id: "",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })),
+      },
+    });
   };
 
   const handleUpdateMatch = (matchId: string, winnerId: string) => {
-    updateMatchMutation.mutate({ matchId, winnerId });
+    updateMatchMutation.mutate({
+      data: {
+        tournamentId,
+        matchId,
+        score1: 1,
+        score2: 0,
+        winnerId,
+      },
+    });
   };
 
-  if (!bracketData && brackets.length === 0) {
+  if (isBracketLoading || isParticipantsLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-muted-foreground">Loading tournament data...</p>
+      </div>
+    );
+  }
+
+  if (isBracketError || isParticipantsError) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <p className="mb-4 text-muted-foreground">No brackets have been generated yet.</p>
+        <p className="mb-4 text-muted-foreground">
+          Error loading tournament data
+        </p>
+        <Button
+          onClick={() => {
+            queryClient.refetchQueries({
+              queryKey: ["brackets", tournamentId],
+            });
+            queryClient.refetchQueries({
+              queryKey: ["participants", tournamentId],
+            });
+          }}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  if (!bracketData || bracketData.matches.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <p className="mb-4 text-muted-foreground">
+          No brackets have been generated yet. (Participants:{" "}
+          {participants.length})
+        </p>
         <Button
           onClick={handleGenerateBracket}
-          disabled={participants.length < 2 || generateBracketMutation.isPending}
+          disabled={
+            participants.length < 2 || generateBracketMutation.isPending
+          }
         >
-          {generateBracketMutation.isPending ? "Generating..." : "Generate Bracket"}
+          {generateBracketMutation.isPending
+            ? "Generating..."
+            : "Generate Bracket"}
         </Button>
       </div>
     );
@@ -68,9 +133,7 @@ export function TournamentBrackets({ brackets, participants }: TournamentBracket
 
   return (
     <ScrollArea className="h-[600px]">
-      {bracketData && (
-        <BracketView bracket={bracketData} onUpdateMatch={handleUpdateMatch} />
-      )}
+      <BracketView bracket={bracketData} onUpdateMatch={handleUpdateMatch} />
     </ScrollArea>
   );
 }

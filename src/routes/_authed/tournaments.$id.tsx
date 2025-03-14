@@ -92,13 +92,14 @@ function RouteComponent() {
                 </CardHeader>
                 <CardContent>
                   <TournamentBrackets
-                    brackets={tournament.tournament_brackets}
-                    participants={
-                      tournament.tournament_participants?.map((p) => ({
-                        id: p.id,
-                        user_id: p.user_id,
-                      })) || []
-                    }
+                    tournamentId={tournament.id}
+                    // brackets={tournament.tournament_brackets}
+                    // participants={
+                    //   tournament.tournament_participants?.map((p) => ({
+                    //     id: p.id,
+                    //     user_id: p.user_id,
+                    //   })) || []
+                    // }
                   />
                 </CardContent>
               </Card>
