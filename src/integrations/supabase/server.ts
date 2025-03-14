@@ -2,15 +2,19 @@ import type { Database } from "@/integrations/supabase/generated.types";
 import { createServerClient } from "@supabase/ssr";
 import { parseCookies, setCookie } from "@tanstack/react-start/server";
 
-// const supabaseUrl = 'http://127.0.0.1:54321'
+const SUPABASE_URL = process.env.LOCAL_SUPABASE_URL;
+const ANON_KEY = process.env.LOCAL_SUPABASE_ANON_KEY;
+// const ROLE_KEY = process.env.LOCAL_SUPABASE_ROLE_KEY;
+
+// const SUPABASE_URL = process.env.REMOTE_SUPABASE_URL;
+// const ANON_KEY = process.env.REMOTE_SUPABASE_ANON_KEY;
 
 export function createClient() {
   return createServerClient<Database>(
     // biome-ignore lint/style/noNonNullAssertion: <biome annoying>
-    process.env.SUPABASE_URL!,
-    // supabaseUrl,
+    SUPABASE_URL!,
     // biome-ignore lint/style/noNonNullAssertion: <biome annoying>
-    process.env.SUPABASE_ANON_KEY!,
+    ANON_KEY!,
     {
       cookies: {
         getAll() {
