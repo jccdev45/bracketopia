@@ -4839,13 +4839,6 @@
             "id"
           ],
           "nullNotDistinct": false
-        },
-        {
-          "name": "tournament_brackets_tournament_id_key",
-          "fields": [
-            "tournament_id"
-          ],
-          "nullNotDistinct": false
         }
       ]
     },

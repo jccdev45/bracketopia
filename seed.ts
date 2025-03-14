@@ -1,118 +1,77 @@
-import type { Database } from "@/integrations/supabase/generated.types";
-import { copycat, faker } from "@snaplet/copycat";
-import { createSeedClient, type profilesScalars } from "@snaplet/seed";
-import { createClient } from "@supabase/supabase-js";
+import { copycat } from "@snaplet/copycat";
+import { createSeedClient } from "@snaplet/seed";
+
+const generateRandomColor = (): string => {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgb(${r},${g},${b})`;
+};
 
 const main = async () => {
-const seed = await createSeedClient({
-  dryRun: true
-});
-
-const supabase = createClient<Database>(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
-const PASSWORD = "password";
-
-// Reset database
-await seed.$resetDatabase();
-
-for (let i = 0; i < 5; i += 1) {
-  // console.log(`Creating user ${i + 1}`)
-  const email = copycat.email(i).toLowerCase();
-  const avatar_url = faker.image.avatar();
-  const username = copycat.username(i);
-  await supabase.auth.signUp({
-    email,
-    password: PASSWORD,
-    options: {
-      data: {
-        avatar_url,
-        username,
-      },
-    },
+  const seed = await createSeedClient({
+    // dryRun: true,
   });
-}
+  await seed.$resetDatabase();
 
-const { data: databaseProfiles } = await supabase.from("profiles").select();
-const profiles: profilesScalars[] =
-  databaseProfiles?.map((profile) => ({
-    avatar_url: profile.avatar_url,
-    id: profile.id,
-    username: profile.username,
-  })) ?? [];
+  const profilesStore = await seed.profiles((x) =>
+    x(10, ({ seed }) => {
+      const email = copycat.email(seed);
+      const username = copycat.username(seed);
+      const avatar_url = `https://placehold.co/100/${generateRandomColor()}?text=${username.charAt(0)}`;
 
-// Create profiles
-// const profiles = await seed.profiles((x) =>
-//   x(3, {
-//     username: (ctx) => copycat.username(ctx.seed).toLowerCase(),
-//     // avatar_url: (ctx) => `https://placehold.co/100/png?text=${ctx.data.username}`,
-//     // avatar_url: ({ seed }) => faker.image.avatar()
-//   })
-// );
-
-// Create tournament
-await seed.tournaments((x) =>
-  x(1, ({ index }) => {
-    return {
-      tournament_brackets: (x) => x(1, {
-        structure: {
-          rounds: 3,
-          matches: [],
+      return {
+        username,
+        avatar_url,
+        users: () => {
+          return {
+            email,
+            raw_user_meta_data: {
+              avatar_url,
+              username,
+              display_name: username,
+            },
+          };
         },
-        current_round: 1,
-      }),
-      tournament_matches: (x) => x(1, ({ index }) => {
-        return {
-          round: 1,
-          match_number: index + 1,
-          status: "pending",
-        }
-      }),
-      tournament_moderators: (x) => x(1),
-      tournament_participants: (x) => x(1),
-      title: `Tournament ${index + 1}`,
-      description: (ctx) => copycat.words(ctx.seed, { min: 3, max: 10}),
-      max_participants: (ctx) => copycat.int(ctx.seed, { min: 2, max: 16 }),
-      registration_open: (ctx) => copycat.bool(ctx.seed),
-      // creator_id: (ctx) => ctx.$store.profiles[Math.floor(Math.random() * ctx.$store.profiles.length)].id,
-    }
-  }),
-  { connect: { profiles } }
-);
+      };
+    })
+  );
+  const { profiles } = profilesStore;
 
-// Create tournament participants
-// const participants = await seed.tournament_participants((x) =>
-//   x(3),
-//   { connect: tournament }
-// );
+  const successfulUsers = profiles.filter((user) => user !== null);
+  const userIds = successfulUsers
+    .map((user) => user?.id)
+    .filter((id) => id !== undefined);
 
-// Create tournament bracket
-// await seed.tournament_brackets((x) =>
-//   x(3, {
-//     structure: {
-//       rounds: 3,
-//       matches: [],
-//     },
-//     current_round: 1,
-//   })
-// );
-
-// Create first round matches
-// await seed.tournament_matches((x) =>
-//   x(3, ({ index }) => ({
-//     round: 1,
-//     match_number: index + 1,
-//     status: "pending",
-//   })),
-//   { connect: participants }
-// );
-
-// Create moderators
-// await seed.tournament_moderators((x) =>
-//   x(profiles.profiles.length),
-//   { connect: profiles }
-// )
+  await seed.tournaments(
+    (x) =>
+      x(12, ({ seed, index }) => ({
+        title: `Tournament ${index + 1}`,
+        description: copycat.words(seed, { min: 3, max: 10 }),
+        max_participants: 8,
+        registration_open: copycat.bool(seed),
+        // creator_id: userIds[index % userIds.length],
+        tournament_brackets: (x) =>
+          x(1, () => ({
+            structure: {
+              rounds: 3,
+              matches: [],
+            },
+            current_round: 1,
+          })),
+        tournament_matches: (x) =>
+          x(Math.min(10, 8 * 2), () => ({
+            round: 1,
+            match_number: index + 1,
+            status: "pending",
+          })),
+        tournament_moderators: (x) =>
+          x(2, () => ({ user_id: copycat.oneOf(seed, userIds) })),
+        tournament_participants: (x) =>
+          x(8, () => ({ user_id: copycat.oneOf(seed, userIds) })),
+      })),
+    { connect: profilesStore }
+  );
 
   process.exit();
 };
