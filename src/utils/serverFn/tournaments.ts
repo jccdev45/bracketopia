@@ -6,6 +6,8 @@ import type {
   TournamentWithDetails,
 } from "@/types/tournament.types";
 import { createServerFn } from "@tanstack/react-start";
+// NOTE: for temp function
+// import { faker } from "@snaplet/copycat";
 
 class TournamentError extends Error {
   constructor(
@@ -62,6 +64,7 @@ export const fetchTournamentsFn = createServerFn({ method: "GET" }).handler(
         )
       `,
       )
+      .limit(10)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -211,3 +214,130 @@ export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
     return data;
   },
 );
+
+// NOTE: temp function to manually bulk edit incorrect seeded data 😬
+// export const tempUpdateTournamentFn = createServerFn({
+//   method: "POST",
+// }).handler(async () => {
+//   const supabase = createClient();
+
+//   try {
+//     const { data: tournamentIds, error: idError } = await supabase
+//       .from("tournaments")
+//       .select(`
+//         id,
+//         profiles (
+//           id
+//         )
+//       `);
+
+//     if (idError) {
+//       console.error("Error fetching tournament IDs:", idError);
+//       throw new TournamentError(
+//         "Failed to fetch tournament IDs for update.",
+//         "FETCH_IDS_FAILED",
+//       );
+//     }
+
+//     await Promise.all(
+//       tournamentIds.map(async (tournament) => {
+//         const { error: tournError } = await supabase
+//           .from("tournaments")
+//           .update({
+//             creator_id: tournament.profiles.id,
+//             title: `Tournament ${faker.number.int({
+//               min: 1,
+//               max: 50,
+//             })}`,
+//             description: faker.lorem.sentence(),
+//             max_participants: faker.number.int({
+//               min: 10,
+//               max: 100,
+//             }),
+//             registration_open: faker.datatype.boolean(),
+//           })
+//           .eq("id", tournament.id);
+
+//         if (tournError) {
+//           console.error(
+//             `Error updating tournament ${tournament.id}:`,
+//             tournError,
+//           );
+//           throw new TournamentError(
+//             "Failed to update tournament.",
+//             "UPDATE_FAILED",
+//           );
+//         }
+//       }),
+//     );
+
+//     const { data: bracketIds, error: bracketFetchError } = await supabase
+//       .from("tournament_brackets")
+//       .select("id");
+
+//     if (bracketFetchError) {
+//       console.error("Error fetching bracket IDs:", bracketFetchError);
+//       throw new TournamentError(
+//         "Failed to fetch bracket IDs for update.",
+//         "FETCH_BRACKET_IDS_FAILED",
+//       );
+//     }
+
+//     await Promise.all(
+//       bracketIds.map(async (bracket) => {
+//         const { error: bracketError } = await supabase
+//           .from("tournament_brackets")
+//           .update({
+//             structure: {
+//               rounds: faker.number.int({
+//                 min: 1,
+//                 max: 5,
+//               }),
+//               matches: [],
+//             },
+//             current_round: faker.number.int({
+//               min: 1,
+//               max: 5,
+//             }),
+//           })
+//           .eq("id", bracket.id);
+
+//         if (bracketError) {
+//           console.error(`Error updating bracket ${bracket.id}:`, bracketError);
+//         }
+//       }),
+//     );
+//     console.log("Tournaments and brackets updated successfully.");
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Error updating tournaments:", error);
+//     throw new TournamentError(
+//       "An unexpected error occurred during the update.",
+//       "UNEXPECTED_ERROR",
+//     );
+//   }
+
+//   // const { error: partError } = await supabase
+//   //   .from("tournament_brackets")
+//   //   .update({
+//   //     structure: {
+//   //       rounds: faker.number.int({
+//   //         min: 1,
+//   //         max: 5,
+//   //       }),
+//   //     },
+//   //     current_round: faker.number.int({
+//   //       min: 1,
+//   //       max: 5,
+//   //     }),
+//   //   });
+
+//   // if (tournError || partError) {
+//   //   const error = tournError || partError;
+//   //   console.error("Supabase error: ", error);
+//   //   throw new TournamentError(
+//   //     "Unable to update tournament.",
+//   //     "TOURNAMENT_UPDATE_FAILED",
+//   //   );
+//   // }
+// });

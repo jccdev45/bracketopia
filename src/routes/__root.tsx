@@ -25,7 +25,8 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Menu, UserIcon } from "lucide-react";
-
+// NOTE: temp function import
+// import { tempUpdateTournamentFn } from "@/utils/serverFn/tournaments";
 interface RouterContext {
   queryClient: QueryClient;
   user?: User | null;
@@ -121,6 +122,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                       Create Tournament
                     </Link>
                   )}
+
+                  {/* NOTE: temporary button to fire DB update command and fix seeded data */}
+                  {/* <Button onClick={() => tempUpdateTournamentFn()}>FIX</Button> */}
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
