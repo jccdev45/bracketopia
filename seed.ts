@@ -13,7 +13,7 @@ const profilesNum = 50;
 
 const main = async () => {
   const seed = await createSeedClient({
-    dryRun: true,
+    // dryRun: true,
   });
   await seed.$resetDatabase();
 

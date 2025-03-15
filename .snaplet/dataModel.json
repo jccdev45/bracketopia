@@ -5578,7 +5578,7 @@
           "name": "registration_open",
           "columnName": "registration_open",
           "type": "bool",
-          "isRequired": false,
+          "isRequired": true,
           "kind": "scalar",
           "isList": false,
           "isGenerated": false,

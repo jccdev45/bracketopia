@@ -280,7 +280,7 @@ export type Database = {
           description: string | null
           id: string
           max_participants: number
-          registration_open: boolean | null
+          registration_open: boolean
           title: string
           updated_at: string
         }
@@ -290,7 +290,7 @@ export type Database = {
           description?: string | null
           id?: string
           max_participants: number
-          registration_open?: boolean | null
+          registration_open?: boolean
           title: string
           updated_at?: string
         }
@@ -300,7 +300,7 @@ export type Database = {
           description?: string | null
           id?: string
           max_participants?: number
-          registration_open?: boolean | null
+          registration_open?: boolean
           title?: string
           updated_at?: string
         }
