@@ -1,21 +1,5 @@
-import { authFormOpts } from "@/utils/form/form-options";
-import {
-  ServerValidateError,
-  createServerValidate,
-  getFormData,
-} from "@tanstack/react-form/start";
+// src/utils/form/form.ts
 import { createServerFn } from "@tanstack/react-start";
-import { setResponseStatus } from "@tanstack/react-start/server";
-
-// TODO: Verify what server-side validation is needed
-const serverValidate = createServerValidate({
-  ...authFormOpts,
-  onServerValidate: ({ value }) => {
-    if (value.username.length < 3) {
-      return "Username must be more than 3 characters";
-    }
-  },
-});
 
 export const handleForm = createServerFn({
   method: "POST",
@@ -26,27 +10,13 @@ export const handleForm = createServerFn({
     }
     return data;
   })
-  // NOTE: this whole function is direct from https://github.com/TanStack/form/blob/fed72edb6c780f06e013d5d617a505eb4649be79/examples/react/tanstack-start/app/utils/form.tsx#L19
-  // idk why handler errors, I'm probably fucking something up somewhere
-  // @ts-expect-error
-  .handler(async (ctx) => {
-    try {
-      await serverValidate(ctx.data);
-    } catch (e) {
-      if (e instanceof ServerValidateError) {
-        return e.response;
-      }
-
-      console.error(e);
-      setResponseStatus(500);
-      return "There was an internal error";
-    }
-
+  .handler(async () => {
+    // This is just a placeholder.  We're doing validation in the onSubmit now.
     return "Form has validated successfully";
   });
 
 export const getFormDataFromServer = createServerFn({ method: "GET" }).handler(
   async () => {
-    return getFormData();
+    return {}; // Return an empty object, as we are not using the pre-filled form data
   },
 );
