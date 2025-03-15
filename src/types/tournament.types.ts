@@ -8,60 +8,55 @@ import type { Profile } from "@/types/profile.types";
 
 // Base types from Supabase
 export type Tournament = Tables<"tournaments">;
-export type TournamentParticipant = Tables<"tournament_participants">;
-export type TournamentModerator = Tables<"tournament_moderators">;
-export type TournamentMatch = Tables<"tournament_matches">;
-export type TournamentBracket = Tables<"tournament_brackets">;
+export type Participant = Tables<"participants">;
+export type Moderator = Tables<"moderators">;
+export type Match = Tables<"matches">;
+export type Bracket = Tables<"brackets">;
 
 // --- Insert types (for creating new records)
 export type TournamentInsert = TablesInsert<"tournaments">;
-export type TournamentParticipantInsert =
-  TablesInsert<"tournament_participants">;
-export type TournamentModeratorInsert = TablesInsert<"tournament_moderators">;
-export type TournamentBracketInsert = TablesInsert<"tournament_brackets">;
-export type TournamentMatchInsert = TablesInsert<"tournament_matches">;
+export type ParticipantInsert = TablesInsert<"participants">;
+export type ModeratorInsert = TablesInsert<"moderators">;
+export type BracketInsert = TablesInsert<"brackets">;
+export type MatchInsert = TablesInsert<"matches">;
 
 // --- Update types (for modifying existing records)
 export type TournamentUpdate = TablesUpdate<"tournaments">;
-export type TournamentParticipantUpdate =
-  TablesUpdate<"tournament_participants">;
-export type TournamentModeratorUpdate = TablesUpdate<"tournament_moderators">;
-export type TournamentBracketUpdate = TablesUpdate<"tournament_brackets">;
-export type TournamentMatchUpdate = TablesUpdate<"tournament_matches">;
+export type ParticipantUpdate = TablesUpdate<"participants">;
+export type ModeratorUpdate = TablesUpdate<"moderators">;
+export type BracketUpdate = TablesUpdate<"brackets">;
+export type MatchUpdate = TablesUpdate<"matches">;
 
 // --- Combined Types (for fetching with relationships) ---
 
 // A participant with their profile data.
-export type TournamentParticipantWithProfile = TournamentParticipant & {
+export type ParticipantWithProfile = Participant & {
   profiles: Profile;
 };
 
 // A moderator with their profile data.
-export type TournamentModeratorWithProfile = TournamentModerator & {
+export type ModeratorWithProfile = Moderator & {
   profiles: Profile;
 };
 
 // A match with participant and winner data (potentially).
-export type TournamentMatchWithParticipants = TournamentMatch & {
-  participant1: TournamentParticipantWithProfile | null;
-  participant2: TournamentParticipantWithProfile | null;
-  winner: TournamentParticipantWithProfile | null;
+export type MatchWithParticipants = Match & {
+  participant1: ParticipantWithProfile | null;
+  participant2: ParticipantWithProfile | null;
+  winner: ParticipantWithProfile | null;
 };
 
 // A bracket with its structured data.  We parse the JSON.
-export type TournamentBracketWithStructure = Omit<
-  TournamentBracket,
-  "structure"
-> & {
+export type BracketWithStructure = Omit<Bracket, "structure"> & {
   structure: BracketStructure;
 };
 
 // A fully loaded tournament with all related data.
 export type TournamentWithDetails = Tournament & {
   creator: Profile; // Use existing Profile
-  tournament_participants: TournamentParticipantWithProfile[];
-  tournament_brackets: TournamentBracketWithStructure[];
-  tournament_moderators: TournamentModeratorWithProfile[];
+  participants: ParticipantWithProfile[];
+  brackets: BracketWithStructure[];
+  moderators: ModeratorWithProfile[];
 };
 
 // --- Bracket Structure (this is the JSON shape) ---
@@ -89,7 +84,7 @@ export interface FetchBracketParams {
 }
 export interface GenerateBracketParams {
   tournamentId: string;
-  participants: Array<Pick<TournamentParticipant, "id" | "user_id">>;
+  participants: Array<Pick<Participant, "id" | "user_id">>;
 }
 
 export interface UpdateMatchResultParams {

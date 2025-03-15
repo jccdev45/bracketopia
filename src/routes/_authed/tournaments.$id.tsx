@@ -73,14 +73,13 @@ function RouteComponent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">
-                    Participants (
-                    {tournament.tournament_participants?.length || 0}/
+                    Participants ({tournament.participants?.length || 0}/
                     {tournament.max_participants})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <TournamentParticipants
-                    participants={tournament.tournament_participants}
+                    participants={tournament.participants}
                   />
                 </CardContent>
               </Card>
@@ -93,9 +92,9 @@ function RouteComponent() {
                 <CardContent>
                   <TournamentBrackets
                     tournamentId={tournament.id}
-                    // brackets={tournament.tournament_brackets}
+                    // brackets={tournament.brackets}
                     // participants={
-                    //   tournament.tournament_participants?.map((p) => ({
+                    //   tournament.participants?.map((p) => ({
                     //     id: p.id,
                     //     user_id: p.user_id,
                     //   })) || []
@@ -112,9 +111,7 @@ function RouteComponent() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <TournamentModerators
-                    moderators={tournament.tournament_moderators}
-                  />
+                  <TournamentModerators moderators={tournament.moderators} />
                 </CardContent>
               </Card>
             </TabsContent>

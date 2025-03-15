@@ -1,10 +1,10 @@
 // src/utils/serverFn/brackets.ts
 import { createClient } from "@/integrations/supabase/server";
 import type {
+  BracketWithStructure,
   FetchBracketParams,
   GenerateBracketParams,
-  TournamentBracketWithStructure,
-  TournamentMatchWithParticipants,
+  MatchWithParticipants,
 } from "@/types/tournament.types";
 import {
   calculateTournamentStructure,
@@ -23,7 +23,7 @@ export const generateBracketFn = createServerFn({ method: "POST" })
     try {
       // Delete existing bracket and matches if they exist
       const { error: deleteMatchError } = await supabase
-        .from("tournament_matches")
+        .from("matches")
         .delete()
         .eq("tournament_id", tournamentId);
 
@@ -34,7 +34,7 @@ export const generateBracketFn = createServerFn({ method: "POST" })
       }
 
       const { error: deleteBracketError } = await supabase
-        .from("tournament_brackets")
+        .from("brackets")
         .delete()
         .eq("tournament_id", tournamentId);
 
@@ -66,7 +66,7 @@ export const generateBracketFn = createServerFn({ method: "POST" })
 
       // Create bracket
       const { data: bracket, error: bracketError } = await supabase
-        .from("tournament_brackets")
+        .from("brackets")
         .insert({
           tournament_id: tournamentId,
           structure, // Insert the *parsed* structure.
@@ -89,7 +89,7 @@ export const generateBracketFn = createServerFn({ method: "POST" })
       }));
 
       const { data: matches, error: matchError } = await supabase
-        .from("tournament_matches")
+        .from("matches")
         .insert(matchInserts)
         .select(`
           id,
@@ -100,15 +100,15 @@ export const generateBracketFn = createServerFn({ method: "POST" })
           score_participant2,
           tournament_id,
           bracket_id,
-          participant1:tournament_participants!participant1_id(
+          participant1:participants!participant1_id(
             id,
             profiles!inner(id, username, avatar_url, created_at, updated_at)
           ),
-          participant2:tournament_participants!participant2_id(
+          participant2:participants!participant2_id(
             id,
             profiles!inner(id, username, avatar_url, created_at, updated_at)
           ),
-          winner:tournament_participants!winner_id(
+          winner:participants!winner_id(
             id,
             profiles!inner(id, username, avatar_url, created_at, updated_at)
           )
@@ -123,7 +123,7 @@ export const generateBracketFn = createServerFn({ method: "POST" })
       return {
         ...bracket,
         structure,
-        matches: (matches as TournamentMatchWithParticipants[]) || [],
+        matches: (matches as MatchWithParticipants[]) || [],
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -139,15 +139,15 @@ export const fetchBracketFn = createServerFn({ method: "GET" })
     async ({
       data: { tournamentId },
     }): Promise<
-      TournamentBracketWithStructure & {
-        matches: TournamentMatchWithParticipants[];
+      BracketWithStructure & {
+        matches: MatchWithParticipants[];
       }
     > => {
       const supabase = createClient();
 
       // First get the bracket data
       const { data: bracket, error: bracketError } = await supabase
-        .from("tournament_brackets")
+        .from("brackets")
         .select("*") // Select all bracket columns
         .eq("tournament_id", tournamentId)
         .single(); // Expect a single bracket.
@@ -160,18 +160,18 @@ export const fetchBracketFn = createServerFn({ method: "GET" })
 
       // Then get all matches with participant data
       const { data: matches, error: matchError } = await supabase
-        .from("tournament_matches")
+        .from("matches")
         .select(`
           *,
-          participant1:tournament_participants!participant1_id(
+          participant1:participants!participant1_id(
             id,
             profiles!inner(id, username, avatar_url, created_at, updated_at)
           ),
-          participant2:tournament_participants!participant2_id(
+          participant2:participants!participant2_id(
             id,
             profiles!inner(id, username, avatar_url, created_at, updated_at)
           ),
-          winner:tournament_participants!winner_id(
+          winner:participants!winner_id(
             id,
             profiles!inner(id, username, avatar_url, created_at, updated_at)
           )
@@ -191,9 +191,9 @@ export const fetchBracketFn = createServerFn({ method: "GET" })
       return {
         ...bracket,
         structure,
-        matches: (matches as TournamentMatchWithParticipants[]) || [], // Cast to your combined type.
-      } as TournamentBracketWithStructure & {
-        matches: TournamentMatchWithParticipants[];
+        matches: (matches as MatchWithParticipants[]) || [], // Cast to your combined type.
+      } as BracketWithStructure & {
+        matches: MatchWithParticipants[];
       };
     },
   );

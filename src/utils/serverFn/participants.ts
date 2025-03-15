@@ -8,7 +8,7 @@ export const fetchParticipantsWithProfilesFn = createServerFn({ method: "GET" })
   .handler(async ({ data: tournamentId }) => {
     const supabase = createClient();
     const { data: participantsWithProfile, error } = await supabase
-      .from("tournament_participants")
+      .from("participants")
       .select(`
           created_at,
           id,

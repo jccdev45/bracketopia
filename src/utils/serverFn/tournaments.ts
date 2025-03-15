@@ -1,8 +1,8 @@
 import { createClient } from "@/integrations/supabase/server";
 import type {
+  ModeratorWithProfile,
+  ParticipantWithProfile,
   TournamentInsert,
-  TournamentModeratorWithProfile,
-  TournamentParticipantWithProfile,
   TournamentStats,
 } from "@/types/tournament.types";
 import { parseStructure } from "@/utils/helpers/brackets";
@@ -104,7 +104,7 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
           created_at,
           updated_at
         ),
-        tournament_participants (
+        participants (
           id,
           tournament_id,
           user_id,
@@ -120,7 +120,7 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
             updated_at
           )
         ),
-        tournament_brackets (
+        brackets (
           id,
           tournament_id,
           structure,
@@ -128,7 +128,7 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
           created_at,
           updated_at
         ),
-         tournament_moderators (
+         moderators (
           id,
           user_id,
           tournament_id,
@@ -162,26 +162,19 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
       );
     }
 
-    const {
-      profiles,
-      tournament_brackets,
-      tournament_participants,
-      tournament_moderators,
-    } = tournamentData;
+    const { profiles, brackets, participants, moderators } = tournamentData;
 
     const formattedTournamentData = {
       ...tournamentData,
       creator: profiles,
-      tournament_brackets: Array.isArray(tournament_brackets)
-        ? tournament_brackets.map((bracket) => ({
+      brackets: Array.isArray(brackets)
+        ? brackets.map((bracket) => ({
             ...bracket,
             structure: parseStructure(bracket.structure),
           }))
         : [],
-      tournament_participants:
-        (tournament_participants as TournamentParticipantWithProfile[]) || [],
-      tournament_moderators:
-        (tournament_moderators as TournamentModeratorWithProfile[]) || [],
+      participants: (participants as ParticipantWithProfile[]) || [],
+      moderators: (moderators as ModeratorWithProfile[]) || [],
     };
 
     return formattedTournamentData;
@@ -222,9 +215,9 @@ export const addTournamentFn = createServerFn({ method: "POST" })
 
     return {
       ...tournamentData,
-      tournament_participants: [],
-      tournament_brackets: [],
-      tournament_moderators: [],
+      participants: [],
+      brackets: [],
+      moderators: [],
     };
   });
 
@@ -302,7 +295,7 @@ export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
 //     );
 
 //     const { data: bracketIds, error: bracketFetchError } = await supabase
-//       .from("tournament_brackets")
+//       .from("brackets")
 //       .select("id");
 
 //     if (bracketFetchError) {
@@ -316,7 +309,7 @@ export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
 //     await Promise.all(
 //       bracketIds.map(async (bracket) => {
 //         const { error: bracketError } = await supabase
-//           .from("tournament_brackets")
+//           .from("brackets")
 //           .update({
 //             structure: {
 //               rounds: faker.number.int({
@@ -348,7 +341,7 @@ export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
 //   }
 
 //   // const { error: partError } = await supabase
-//   //   .from("tournament_brackets")
+//   //   .from("brackets")
 //   //   .update({
 //   //     structure: {
 //   //       rounds: faker.number.int({

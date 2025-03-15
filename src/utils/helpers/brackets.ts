@@ -1,8 +1,5 @@
 import type { Tables } from "@/integrations/supabase/generated.types";
-import type {
-  BracketStructure,
-  TournamentParticipant,
-} from "@/types/tournament.types";
+import type { BracketStructure, Participant } from "@/types/tournament.types";
 
 /**
  * Type guard to check if a value is a BracketStructure
@@ -51,10 +48,10 @@ export const calculateTournamentStructure = (
  * Creates first round matches from participants
  */
 export const createFirstRoundMatches = (
-  participants: Array<Pick<TournamentParticipant, "id" | "user_id">>,
+  participants: Array<Pick<Participant, "id" | "user_id">>,
 ): Array<
   Pick<
-    Tables<"tournament_matches">,
+    Tables<"matches">,
     "match_number" | "participant1_id" | "participant2_id" | "round" | "status"
   >
 > => {
@@ -82,7 +79,7 @@ export const createFutureRoundMatches = (
   startingMatchNumber: number,
 ): Array<
   Pick<
-    Tables<"tournament_matches">,
+    Tables<"matches">,
     "match_number" | "participant1_id" | "participant2_id" | "round" | "status"
   >
 > => {

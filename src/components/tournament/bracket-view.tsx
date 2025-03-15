@@ -2,29 +2,29 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type {
   BracketStructure,
-  TournamentMatchWithParticipants,
-  TournamentParticipantWithProfile,
+  MatchWithParticipants,
+  ParticipantWithProfile,
 } from "@/types/tournament.types";
 
 interface BracketViewProps {
   bracket: {
     structure: BracketStructure;
-    matches: TournamentMatchWithParticipants[];
+    matches: MatchWithParticipants[];
   };
   onUpdateMatch?: (matchId: string, winnerId: string) => void;
 }
 
 const isValidParticipant = (
-  participant: TournamentParticipantWithProfile | null,
-): participant is TournamentParticipantWithProfile => {
+  participant: ParticipantWithProfile | null,
+): participant is ParticipantWithProfile => {
   return participant !== null && typeof participant.id === "string";
 };
 
 const isValidMatchForUpdate = (
-  match: TournamentMatchWithParticipants,
-): match is TournamentMatchWithParticipants & {
-  participant1: TournamentParticipantWithProfile;
-  participant2: TournamentParticipantWithProfile;
+  match: MatchWithParticipants,
+): match is MatchWithParticipants & {
+  participant1: ParticipantWithProfile;
+  participant2: ParticipantWithProfile;
 } => {
   return (
     match.status === "pending" &&
@@ -36,7 +36,7 @@ const isValidMatchForUpdate = (
 export function BracketView({ bracket, onUpdateMatch }: BracketViewProps) {
   // Use bracket.matches to group by round
   const matchesByRound = bracket.matches.reduce<
-    Record<number, TournamentMatchWithParticipants[]>
+    Record<number, MatchWithParticipants[]>
   >((acc, match) => {
     if (!acc[match.round]) {
       acc[match.round] = [];

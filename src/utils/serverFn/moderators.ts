@@ -13,7 +13,7 @@ export const fetchModeratorsWithProfilesFn = createServerFn({ method: "GET" })
   .handler(async ({ data: tournamentId }) => {
     const supabase = createClient();
     const { data: moderatorsWithProfiles, error } = await supabase
-      .from("tournament_moderators")
+      .from("moderators")
       .select(`
           id,
           user_id,

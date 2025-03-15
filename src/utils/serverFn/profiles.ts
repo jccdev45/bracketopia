@@ -35,7 +35,7 @@ export const fetchUserTournamentsFn = createServerFn({ method: "GET" })
 
     // Fetch tournaments where user is a participant
     const { data: participations, error: participationsError } = await supabase
-      .from("tournament_participants")
+      .from("participants")
       .select("tournament_id, tournaments(*)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });

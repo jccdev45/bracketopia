@@ -14,7 +14,7 @@ export const updateMatchResultFn = createServerFn({ method: "POST" })
 
       try {
         const { error: updateError } = await supabase
-          .from("tournament_matches")
+          .from("matches")
           .update({
             score_participant1: score1,
             score_participant2: score2,
@@ -30,7 +30,7 @@ export const updateMatchResultFn = createServerFn({ method: "POST" })
 
         // Get the updated match to find the next match
         const { data: match, error: matchError } = await supabase
-          .from("tournament_matches")
+          .from("matches")
           .select("match_number, round, bracket_id")
           .eq("id", matchId)
           .single();
@@ -52,7 +52,7 @@ export const updateMatchResultFn = createServerFn({ method: "POST" })
 
         // Update the next match with the winner
         const { error: nextMatchError } = await supabase
-          .from("tournament_matches")
+          .from("matches")
           .update(updatePayload)
           .eq("bracket_id", match.bracket_id)
           .eq("match_number", nextMatchNumber)
