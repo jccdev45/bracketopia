@@ -1,5 +1,5 @@
 import { createClient } from "@/integrations/supabase/server";
-import type { UpdateMatchResultParams } from "@/types/tournament.types";
+import type { UpdateMatchResultParams } from "@/types/match.types";
 import { createServerFn } from "@tanstack/react-start";
 
 export const updateMatchResultFn = createServerFn({ method: "POST" })

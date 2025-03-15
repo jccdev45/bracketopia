@@ -1,9 +1,7 @@
 import type { Tables } from "@/integrations/supabase/generated.types";
-import type { BracketStructure, Participant } from "@/types/tournament.types";
+import type { BracketStructure } from "@/types/bracket.types";
+import type { Participant } from "@/types/participant.types";
 
-/**
- * Type guard to check if a value is a BracketStructure
- */
 export const isStructure = (value: unknown): value is BracketStructure => {
   if (!value || typeof value !== "object") return false;
   const struct = value as Partial<BracketStructure>;
@@ -20,9 +18,6 @@ export const isStructure = (value: unknown): value is BracketStructure => {
   );
 };
 
-/**
- * Safely converts JSON to BracketStructure type
- */
 export const parseStructure = (value: unknown): BracketStructure => {
   if (!isStructure(value)) {
     throw new Error("Invalid structure format");
@@ -30,9 +25,6 @@ export const parseStructure = (value: unknown): BracketStructure => {
   return value;
 };
 
-/**
- * Calculates tournament structure based on number of participants
- */
 export const calculateTournamentStructure = (
   numParticipants: number,
 ): {
@@ -44,9 +36,6 @@ export const calculateTournamentStructure = (
   return { numRounds, totalMatches };
 };
 
-/**
- * Creates first round matches from participants
- */
 export const createFirstRoundMatches = (
   participants: Array<Pick<Participant, "id" | "user_id">>,
 ): Array<
@@ -71,9 +60,6 @@ export const createFirstRoundMatches = (
   return matches;
 };
 
-/**
- * Creates future round matches
- */
 export const createFutureRoundMatches = (
   numRounds: number,
   startingMatchNumber: number,

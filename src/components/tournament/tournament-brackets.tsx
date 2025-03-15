@@ -1,12 +1,14 @@
-// src/components/tournament/tournament-brackets.tsx
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { GenerateBracketParams } from "@/types/bracket.types";
+import type { ParticipantWithProfile } from "@/types/participant.types";
 import {
   bracketMutationOptions,
   bracketQueryOptions,
 } from "@/utils/queries/brackets";
 import { participantsQueryOptions } from "@/utils/queries/participants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { BracketView } from "./bracket-view";
 
 interface TournamentBracketsProps {
@@ -20,14 +22,16 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
     data: bracketData,
     isLoading: isBracketLoading,
     isError: isBracketError,
+    error: bracketError,
   } = useQuery({
     ...bracketQueryOptions.list(tournamentId),
   });
 
   const {
-    data: participants = [],
+    data: participants = [] as ParticipantWithProfile[],
     isLoading: isParticipantsLoading,
     isError: isParticipantsError,
+    error: participantsError,
   } = useQuery({
     ...participantsQueryOptions.list(tournamentId),
   });
@@ -36,6 +40,9 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
     ...bracketMutationOptions.generate(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brackets", tournamentId] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -47,14 +54,16 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
   });
 
   const handleGenerateBracket = () => {
+    const params: GenerateBracketParams = {
+      tournamentId,
+      participants: participants.map((p) => ({
+        id: p.id,
+        user_id: p.user_id,
+      })),
+    };
+
     generateBracketMutation.mutate({
-      data: {
-        tournamentId,
-        participants: participants.map((p) => ({
-          id: p.id,
-          user_id: p.user_id,
-        })),
-      },
+      data: params,
     });
   };
 
@@ -63,7 +72,7 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
       data: {
         tournamentId,
         matchId,
-        score1: 1,
+        score1: 1, //  Example scores.
         score2: 0,
         winnerId,
       },
@@ -79,10 +88,15 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
   }
 
   if (isBracketError || isParticipantsError) {
+    const errorMessage = isBracketError
+      ? `Bracket Error: ${(bracketError as Error)?.message}` // Cast to Error
+      : `Participant Error: ${
+          (participantsError as Error)?.message // Cast to Error
+        }`;
     return (
       <div className="flex flex-col items-center justify-center p-8">
         <p className="mb-4 text-muted-foreground">
-          Error loading tournament data
+          Error loading tournament data: {errorMessage}
         </p>
         <Button
           onClick={() => {
@@ -100,7 +114,7 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
     );
   }
 
-  if (!bracketData || bracketData.matches.length === 0) {
+  if (!bracketData) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
         <p className="mb-4 text-muted-foreground">

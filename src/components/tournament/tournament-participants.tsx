@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ParticipantWithProfile } from "@/types/tournament.types";
+import type { ParticipantWithProfile } from "@/types/participant.types";
 
 interface TournamentParticipantsProps {
   participants?: ParticipantWithProfile[];
@@ -20,6 +20,7 @@ export function TournamentParticipants({
   return (
     <Card className="mb-6">
       <CardHeader>
+        {/* Insert form component Combobox for participant selection */}
         <CardTitle>Participants</CardTitle>
       </CardHeader>
       <CardContent>

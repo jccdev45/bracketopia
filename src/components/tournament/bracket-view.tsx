@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type {
-  BracketStructure,
-  MatchWithParticipants,
-  ParticipantWithProfile,
-} from "@/types/tournament.types";
+import type { BracketStructure } from "@/types/bracket.types";
+import type { MatchWithParticipants } from "@/types/match.types";
+import type { ParticipantWithProfile } from "@/types/participant.types";
 
 interface BracketViewProps {
   bracket: {
@@ -62,7 +60,6 @@ export function BracketView({ bracket, onUpdateMatch }: BracketViewProps) {
             >
               {/*Use the matches grouped by round */}
               {(matchesByRound[round] || []).map((match) => {
-                console.log("🚀 ~ { ~ match:", match);
                 return (
                   <Card
                     key={match.id}

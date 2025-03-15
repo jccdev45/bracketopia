@@ -1,7 +1,7 @@
 import { createClient } from "@/integrations/supabase/server";
+import type { ModeratorWithProfile } from "@/types/moderator.types";
+import type { ParticipantWithProfile } from "@/types/participant.types";
 import type {
-  ModeratorWithProfile,
-  ParticipantWithProfile,
   TournamentInsert,
   TournamentStats,
 } from "@/types/tournament.types";

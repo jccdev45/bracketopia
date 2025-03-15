@@ -3,14 +3,14 @@ import type { Session, User } from "@supabase/supabase-js";
 // Narrowed types for User and Session (to avoid non-serializable properties)
 export type NarrowedUser = Pick<
   User,
-  | "id"
-  | "aud"
-  | "email"
-  | "phone"
-  | "app_metadata"
   | "user_metadata"
+  | "app_metadata"
   | "created_at"
   | "updated_at"
+  | "phone"
+  | "email"
+  | "aud"
+  | "id"
 >;
 
 export type NarrowedSession = Pick<
@@ -22,41 +22,41 @@ export type NarrowedSession = Pick<
 export type Provider = "google" | "apple" | "facebook";
 
 export type LoginSchemaValues = {
-  email: string;
   password: string;
+  email: string;
 };
 
 export type SignupSchemaValues = {
-  email: string;
   password: string;
   username: string;
+  email: string;
 };
 
 export type UserAuthUpdate = {
-  email?: string;
+  avatar_url?: string;
   password?: string;
   username?: string;
-  avatar_url?: string;
+  email?: string;
 };
 
 export type VerifyOtp = {
+  type: "email" | "recovery" | "invite" | "email_change";
   email: string;
   token: string;
-  type: "email" | "recovery" | "invite" | "email_change";
 };
 
 export type Resend = {
   type: "signup" | "email_change";
-  email: string;
   redirectUrl?: string;
+  email: string;
 };
 
 // Success and error types for various functions
 
 export type AuthSuccess<T> = {
-  error: false;
   message?: string;
-  data?: T; // Generic type parameter
+  error: false;
+  data?: T;
 };
 
 export type AuthError = {

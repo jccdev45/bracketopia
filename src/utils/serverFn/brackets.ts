@@ -4,8 +4,8 @@ import type {
   BracketWithStructure,
   FetchBracketParams,
   GenerateBracketParams,
-  MatchWithParticipants,
-} from "@/types/tournament.types";
+} from "@/types/bracket.types";
+import type { MatchWithParticipants } from "@/types/match.types";
 import {
   calculateTournamentStructure,
   createFirstRoundMatches,
@@ -28,6 +28,10 @@ export const generateBracketFn = createServerFn({ method: "POST" })
         .eq("tournament_id", tournamentId);
 
       if (deleteMatchError) {
+        console.error(
+          "❌ ~ generateBracketFn ~ deleteMatchError:",
+          deleteMatchError,
+        );
         throw new Error(
           `Failed to clean up old matches: ${deleteMatchError.message}`,
         );
@@ -39,6 +43,10 @@ export const generateBracketFn = createServerFn({ method: "POST" })
         .eq("tournament_id", tournamentId);
 
       if (deleteBracketError) {
+        console.error(
+          "❌ ~ generateBracketFn ~ deleteBracketError:",
+          deleteBracketError,
+        );
         throw new Error(
           `Failed to clean up old bracket: ${deleteBracketError.message}`,
         );
@@ -69,21 +77,22 @@ export const generateBracketFn = createServerFn({ method: "POST" })
         .from("brackets")
         .insert({
           tournament_id: tournamentId,
-          structure, // Insert the *parsed* structure.
+          structure,
           current_round: 1,
         })
         .select()
-        .single(); // Use .single() for a single row.
+        .single();
 
       if (bracketError || !bracket) {
+        console.error("❌ ~ .handler ~ bracketError:", bracketError);
         throw new Error(
           bracketError?.message ?? "Failed to create tournament bracket",
         );
       }
 
-      // Create matches.  We now use `allMatches` here.
+      // Create matches
       const matchInserts = allMatches.map((match) => ({
-        ...match, // Keep existing properties
+        ...match,
         tournament_id: tournamentId,
         bracket_id: bracket.id,
       }));
@@ -115,6 +124,8 @@ export const generateBracketFn = createServerFn({ method: "POST" })
         `)
         .order("round", { ascending: true })
         .order("match_number", { ascending: true });
+      console.log("🚀 ~ .handler ~ matches:", matches);
+      console.log("🚀 ~ .handler ~ matches:", matchError);
 
       if (matchError) {
         throw new Error(`Failed to create matches: ${matchError.message}`);
@@ -126,6 +137,7 @@ export const generateBracketFn = createServerFn({ method: "POST" })
         matches: (matches as MatchWithParticipants[]) || [],
       };
     } catch (error) {
+      console.error("❌ ~ .handler ~ error:", error);
       if (error instanceof Error) {
         throw new Error(`Failed to generate bracket: ${error.message}`);
       }
@@ -139,59 +151,68 @@ export const fetchBracketFn = createServerFn({ method: "GET" })
     async ({
       data: { tournamentId },
     }): Promise<
-      BracketWithStructure & {
-        matches: MatchWithParticipants[];
-      }
+      | (BracketWithStructure & {
+          matches: MatchWithParticipants[];
+        })
+      | null // Add | null to return type
     > => {
       const supabase = createClient();
+      console.log("fetchBracketFn called with tournamentId:", tournamentId);
 
-      // First get the bracket data
       const { data: bracket, error: bracketError } = await supabase
         .from("brackets")
-        .select("*") // Select all bracket columns
+        .select("*")
         .eq("tournament_id", tournamentId)
-        .single(); // Expect a single bracket.
+        .maybeSingle(); // Use maybeSingle()
 
-      if (bracketError || !bracket) {
-        throw new Error(
-          bracketError?.message ?? "No bracket found for this tournament",
-        );
+      if (bracketError) {
+        console.error("fetchBracketFn error: ", bracketError.message);
+        throw new Error(`Failed to fetch bracket: ${bracketError.message}`);
       }
 
-      // Then get all matches with participant data
+      if (!bracket) {
+        console.log(
+          "fetchBracketFn: No bracket found for tournament ID:",
+          tournamentId,
+        );
+        return null;
+      }
+
       const { data: matches, error: matchError } = await supabase
         .from("matches")
         .select(`
-          *,
-          participant1:participants!participant1_id(
-            id,
-            profiles!inner(id, username, avatar_url, created_at, updated_at)
-          ),
-          participant2:participants!participant2_id(
-            id,
-            profiles!inner(id, username, avatar_url, created_at, updated_at)
-          ),
-          winner:participants!winner_id(
-            id,
-            profiles!inner(id, username, avatar_url, created_at, updated_at)
-          )
-        `)
+        *,
+        participant1:participants!participant1_id(
+          id,
+          profiles!inner(id, username, avatar_url, created_at, updated_at)
+        ),
+        participant2:participants!participant2_id(
+          id,
+          profiles!inner(id, username, avatar_url, created_at, updated_at)
+        ),
+        winner:participants!winner_id(
+          id,
+          profiles!inner(id, username, avatar_url, created_at, updated_at)
+        )
+      `)
         .eq("tournament_id", tournamentId)
         .eq("bracket_id", bracket.id)
         .order("round", { ascending: true })
         .order("match_number", { ascending: true });
 
+      console.log("fetchBracketFn - matches data:", matches);
+      console.log("fetchBracketFn - matches error:", matchError);
+
       if (matchError) {
         throw new Error(`Failed to fetch matches: ${matchError.message}`);
       }
 
-      // Parse the JSON structure.  This is important!
       const structure = parseStructure(bracket.structure);
 
       return {
         ...bracket,
         structure,
-        matches: (matches as MatchWithParticipants[]) || [], // Cast to your combined type.
+        matches: (matches as MatchWithParticipants[]) || [],
       } as BracketWithStructure & {
         matches: MatchWithParticipants[];
       };
