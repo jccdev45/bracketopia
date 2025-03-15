@@ -13,7 +13,6 @@ export const updateMatchResultFn = createServerFn({ method: "POST" })
       const supabase = createClient();
 
       try {
-        // Update the match result
         const { error: updateError } = await supabase
           .from("tournament_matches")
           .update({
@@ -42,18 +41,19 @@ export const updateMatchResultFn = createServerFn({ method: "POST" })
           );
         }
 
-        // Find the next match
+        // Calculate the next match number
         const nextMatchNumber = Math.floor((match.match_number - 1) / 2) + 1;
-        const isFirstMatch = match.match_number % 2 === 1;
+
+        // Determine which participant slot to update in the next match
+        const isFirstMatchInPair = match.match_number % 2 !== 0; // Odd number
+        const updatePayload = isFirstMatchInPair
+          ? { participant1_id: winnerId }
+          : { participant2_id: winnerId };
 
         // Update the next match with the winner
         const { error: nextMatchError } = await supabase
           .from("tournament_matches")
-          .update(
-            isFirstMatch
-              ? { participant1_id: winnerId }
-              : { participant2_id: winnerId },
-          )
+          .update(updatePayload)
           .eq("bracket_id", match.bracket_id)
           .eq("match_number", nextMatchNumber)
           .eq("round", match.round + 1);
