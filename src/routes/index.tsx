@@ -1,4 +1,3 @@
-// index.tsx
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FEATURES } from "@/constants/data";
@@ -15,23 +14,23 @@ function App() {
   return (
     <div className="relative isolate">
       {/* Hero Section */}
-      <section className="relative bg-primary dark:bg-primary/30">
+      <section className="relative bg-accent dark:bg-primary/30">
         <div className="-z-10 absolute inset-0 overflow-hidden">
           <div
-            className="absolute inset-0 bg-gradient-to-br from-indigo-300/30 via-purple-300/30 to-pink-300/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]"
+            className="absolute inset-0 animate-gradient bg-gradient-to-br from-primary/40 via-secondary/40 to-accent/40 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]"
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:radial-gradient(white,transparent_70%)]" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 [mask-image:radial-gradient(white,transparent_70%)] dark:opacity-30" />
         </div>
         <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center text-primary-foreground">
+          <div className="mx-auto max-w-2xl text-center">
             <div className="mb-6 flex items-center justify-center">
               <Trophy className="h-12 w-12 animate-float text-primary-foreground" />
             </div>
-            <h1 className="animate-gradient bg-gradient-to-r from-violet-300/50 to-violet-600/90 bg-clip-text font-bold text-4xl text-transparent tracking-tight sm:text-6xl">
-              BracketOpia
+            <h1 className="animate-gradient bg-gradient-to-r from-primary-foreground to-secondary-foreground bg-clip-text font-bold text-4xl text-transparent tracking-tight sm:text-6xl dark:from-accent-foreground dark:to-primary-foreground">
+              Bracketopia
             </h1>
-            <p className="mt-6 text-lg text-primary-foreground/75 leading-8">
+            <p className="mt-6 text-lg text-primary-foreground/80 leading-8">
               Create and manage tournament brackets with ease. Organize
               competitions, approve participants, and track results all in one
               place.
@@ -41,7 +40,7 @@ function App() {
                 <Button asChild size="lg" variant="secondary" className="group">
                   <Link to="/tournaments">
                     Browse Tournaments
-                    <ArrowRight className="ml-2 h-4 w-4 text-accent-foreground transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="ml-2 h-4 w-4 text-primary-foreground transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               ) : (
@@ -63,7 +62,7 @@ function App() {
                     variant="outline"
                     asChild
                     size="lg"
-                    className="text-primary-foreground"
+                    className="text-primary-foreground hover:bg-accent/10"
                   >
                     <Link to="/login">
                       <span className="text-primary-foreground">Login</span>
@@ -79,7 +78,7 @@ function App() {
       {/* Features Section */}
       <section className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="animate-gradient bg-gradient-to-r from-primary/70 to-primary/90 bg-clip-text font-bold text-3xl text-transparent tracking-tight sm:text-4xl">
+          <h2 className="animate-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text font-bold text-3xl text-transparent tracking-tight sm:text-4xl">
             Effortless Tournament Management
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
@@ -91,7 +90,7 @@ function App() {
           {FEATURES.map((feature) => (
             <Card
               key={feature.title}
-              className="transition-colors duration-100 ease-in-out hover:bg-muted/50"
+              className="transition-colors duration-200 ease-in-out hover:bg-accent/10"
             >
               <CardContent className="p-6">
                 <feature.icon className="mb-4 h-8 w-8 text-primary transition-transform group-hover:scale-110" />
@@ -113,43 +112,45 @@ function App() {
           className="-z-10 absolute inset-0 overflow-hidden"
           aria-hidden="true"
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-secondary to-transparent" />
-          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:radial-gradient(white,transparent_70%)]" />
+          <div className="absolute inset-0 animate-gradient bg-gradient-to-t from-secondary/80 to-transparent" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20 [mask-image:radial-gradient(white,transparent_70%)] dark:opacity-30" />
         </div>
         <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-2xl text-center text-secondary-foreground">
-            <h2 className="animate-gradient bg-gradient-to-r from-primary/70 to-primary/90 bg-clip-text font-bold text-3xl text-transparent tracking-tight sm:text-4xl">
+            <h2 className="animate-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text font-bold text-3xl text-transparent tracking-tight sm:text-4xl">
               Ready to Get Started?
             </h2>
-            <p className="mt-4 text-lg text-secondary-foreground/75">
-              BracketOpia is trusted by thousands of organizers to run smooth,
+            <p className="mt-4 text-lg text-secondary-foreground/80">
+              Bracketopia is trusted by thousands of organizers to run smooth,
               fair, and memorable tournaments. Join the community today!
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-x-6">
               <Button
                 asChild
                 size="lg"
-                className="group w-full bg-primary text-primary-foreground transition-all duration-200 ease-in-out sm:w-auto"
+                className="group w-full bg-primary text-primary-foreground transition-all duration-200 ease-in-out hover:bg-primary/90 sm:w-auto"
               >
-                <Link to="/register">
+                <Link to="/tournaments/create">
                   <span className="text-primary-foreground">
                     Create a Tournament Now
                   </span>
                   <ArrowRight className="ml-2 h-4 w-4 text-primary-foreground transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full bg-secondary text-secondary-foreground transition-colors duration-200 ease-in-out sm:w-auto"
-                asChild
-              >
-                <Link to="/login">
-                  <span className="text-secondary-foreground">
-                    Login to Manage Your Tournaments
-                  </span>
-                </Link>
-              </Button>
+              {!user && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full bg-secondary text-secondary-foreground transition-colors duration-200 ease-in-out hover:bg-secondary/20 sm:w-auto"
+                  asChild
+                >
+                  <Link to="/login">
+                    <span className="text-secondary-foreground">
+                      Login to Manage Your Tournaments
+                    </span>
+                  </Link>
+                </Button>
+              )}
             </div>
             <div className="mt-8">
               <p className="text-base text-secondary-foreground/75">

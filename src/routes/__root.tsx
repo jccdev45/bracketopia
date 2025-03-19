@@ -1,5 +1,7 @@
 import { DefaultCatchBoundary } from "@/components/shared/default-catch-boundary";
+import { ModeToggle } from "@/components/shared/mode-toggle";
 import { NotFound } from "@/components/shared/not-found";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/context/theme-provider";
 import TanstackQueryLayout from "@/integrations/tanstack-query/layout";
 import appCss from "@/styles/styles.css?url";
 import { seo } from "@/utils/config/seo";
@@ -24,7 +27,7 @@ import {
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Menu, UserIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 // NOTE: temp function import
 // import { tempUpdateTournamentFn } from "@/utils/serverFn/tournaments";
 interface RouterContext {
@@ -77,12 +80,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Toaster />
-      <Outlet />
-      <TanStackRouterDevtools />
-      <TanstackQueryLayout />
-    </RootDocument>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <RootDocument>
+        <Toaster />
+        <Outlet />
+        <TanStackRouterDevtools />
+        <TanstackQueryLayout />
+      </RootDocument>
+    </ThemeProvider>
   );
 }
 
@@ -102,9 +107,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <div className="flex shrink-0 items-center">
                   <Link
                     to="/"
-                    className="font-bold text-primary-foreground text-xl dark:text-sidebar-primary-foreground"
+                    className="font-bold text-primary text-xl dark:text-sidebar-primary-foreground"
                   >
-                    BracketOpia
+                    Bracketopia
                   </Link>
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -127,12 +132,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   {/* <Button onClick={() => tempUpdateTournamentFn()}>FIX</Button> */}
                 </div>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              <div className="hidden sm:ml-6 sm:flex sm:items-center sm:gap-2">
+                <ModeToggle />
                 {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
-                        <UserIcon className="h-5 w-5 text-gray-500 dark:text-sidebar-foreground" />
+                        <Avatar>
+                          <AvatarImage
+                            src={user.user_metadata.avatar_url as string}
+                          />
+                          <AvatarFallback>
+                            {user.user_metadata.username.charAt(0) as string}
+                          </AvatarFallback>
+                        </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
