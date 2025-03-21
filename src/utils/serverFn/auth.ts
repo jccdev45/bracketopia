@@ -17,26 +17,37 @@ import type {
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
-export const fetchUserFn = createServerFn({ method: "GET" }).handler(
-  // NOTE: this whole function is direct from https://github.com/TanStack/router/blob/1b402d502fedb84cb073994335b2780169ecc8d7/examples/react/start-supabase-basic/src/routes/__root.tsx#L17
-  // idk why handler errors, I'm probably fucking something up somewhere
-  // @ts-expect-error
-  async () => {
-    const supabase = await createClient();
-    const { data, error: _error } = await supabase.auth.getUser();
+interface UserData {
+  id: string;
+  email?: string;
+  user_metadata: { [key: string]: object };
+  app_metadata: { [key: string]: object };
+}
 
-    if (!data.user?.email) {
-      return null;
-    }
+export const fetchUserFn = createServerFn({ method: "GET" })
+  .validator((d: unknown) => d)
+  .handler(async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: _error,
+    } = await supabase.auth.getUser();
 
-    return data.user;
-  },
-);
+    if (!user) return null;
+
+    const { id, email, user_metadata, app_metadata } = user;
+    return {
+      id,
+      email,
+      user_metadata,
+      app_metadata,
+    } as UserData;
+  });
 
 export const emailPasswordLoginFn = createServerFn()
   .validator((d: LoginSchemaValues) => d)
   .handler(async ({ data }) => {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
@@ -57,7 +68,7 @@ export const emailPasswordLoginFn = createServerFn()
 export const signupFn = createServerFn()
   .validator((d: SignupSchemaValues & { redirectUrl?: string }) => d)
   .handler(async ({ data }) => {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -83,7 +94,7 @@ export const signupFn = createServerFn()
 export const magicLinkLoginFn = createServerFn()
   .validator((d: { email: string; redirectUrl?: string }) => d)
   .handler(async ({ data }) => {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email: data.email,
       options: {
