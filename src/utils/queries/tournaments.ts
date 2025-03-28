@@ -3,7 +3,7 @@ import {
   fetchTournamentFn,
   fetchTournamentNamesFn,
   fetchTournamentStatsFn,
-  fetchTournamentsFn,
+  fetchTournamentsWithProfileFn,
 } from "@/utils/serverFn/tournaments";
 import { queryOptions } from "@tanstack/react-query";
 
@@ -13,7 +13,7 @@ export const tournamentQueryOptions = {
   list: () =>
     queryOptions({
       queryKey: ["tournaments", "list"],
-      queryFn: async () => fetchTournamentsFn(),
+      queryFn: async () => fetchTournamentsWithProfileFn(),
       staleTime: ONE_MINUTE,
     }),
   detail: (id: string) =>

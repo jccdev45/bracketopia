@@ -1,10 +1,7 @@
 import { createClient } from "@/integrations/supabase/server";
 import type { ModeratorWithProfile } from "@/types/moderator.types";
 import type { ParticipantWithProfile } from "@/types/participant.types";
-import type {
-  TournamentInsert,
-  TournamentStats,
-} from "@/types/tournament.types";
+import type { TournamentInsert } from "@/types/tournament.types";
 import { parseStructure } from "@/utils/helpers/brackets";
 import { createServerFn } from "@tanstack/react-start";
 // NOTE: for temp function
@@ -25,7 +22,7 @@ export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
     const supabase = createClient();
     const { data, error } = await supabase
       .from("tournaments")
-      .select("max_participants");
+      .select("max_participants, registration_open");
 
     if (error) {
       console.error("Supabase error: ", error);
@@ -35,25 +32,57 @@ export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
       );
     }
 
-    const stats: TournamentStats = {
+    return {
       totalTournaments: data.length,
       totalParticipantSlots: data.reduce(
         (acc, t) => acc + (t.max_participants || 0),
         0,
       ),
+      openTournaments: data.filter((t) => t.registration_open).length,
     };
-
-    return stats;
   },
 );
 
-export const fetchTournamentsFn = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("tournaments")
-      .select(
-        `
+export const fetchTournamentsFn = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("tournaments")
+    .select(
+      `
+        id,
+        title,
+        registration_open,
+        description,
+        max_participants,
+        creator_id,
+        created_at,
+        updated_at
+      `,
+    )
+    .limit(10)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Supabase error: ", error);
+    throw new TournamentError(
+      "Unable to retrieve tournaments.",
+      "TOURNAMENT_FETCH_FAILED",
+    );
+  }
+
+  return data;
+});
+
+export const fetchTournamentsWithProfileFn = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("tournaments")
+    .select(
+      `
         id,
         title,
         registration_open,
@@ -64,21 +93,20 @@ export const fetchTournamentsFn = createServerFn({ method: "GET" }).handler(
           username
         )
       `,
-      )
-      .limit(10)
-      .order("created_at", { ascending: false });
+    )
+    .limit(10)
+    .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Supabase error: ", error);
-      throw new TournamentError(
-        "Unable to retrieve tournaments.",
-        "TOURNAMENT_FETCH_FAILED",
-      );
-    }
+  if (error) {
+    console.error("Supabase error: ", error);
+    throw new TournamentError(
+      "Unable to retrieve tournaments.",
+      "TOURNAMENT_FETCH_FAILED",
+    );
+  }
 
-    return data;
-  },
-);
+  return data;
+});
 
 export const fetchTournamentFn = createServerFn({ method: "GET" })
   .validator((d: string) => d)
