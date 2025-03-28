@@ -6,6 +6,7 @@ dist-ssr
 /.env
 /stash
 /todo.txt
+.vscode
 
 # windsurf rules
 .windsurfrules
