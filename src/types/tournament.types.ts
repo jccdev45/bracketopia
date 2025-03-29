@@ -12,6 +12,10 @@ export type Tournament = Tables<"tournaments">;
 export type TournamentInsert = TablesInsert<"tournaments">;
 export type TournamentUpdate = TablesUpdate<"tournaments">;
 
+export type TournamentWithProfile = Tournament & {
+  profiles: Partial<Profile>;
+};
+
 export type TournamentWithDetails = Tournament & {
   participants: ParticipantWithProfile[];
   moderators: ModeratorWithProfile[];

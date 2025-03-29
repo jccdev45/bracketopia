@@ -1,10 +1,26 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { Profile } from "@/types/profile.types";
 import type { Tournament } from "@/types/tournament.types";
+import type { User } from "@supabase/supabase-js";
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, User, Users } from "lucide-react";
+import { CalendarDays, UserIcon, Users } from "lucide-react";
 
 interface TournamentListProps {
-  tournaments: Tournament[];
+  tournaments: Array<
+    Pick<
+      Tournament,
+      | "id"
+      | "title"
+      | "registration_open"
+      | "description"
+      | "created_at"
+      | "max_participants"
+    > & {
+      profiles: Pick<Profile, "username">;
+    }
+  >;
+  user: User;
 }
 
 export function TournamentList({ tournaments }: TournamentListProps) {
@@ -21,46 +37,44 @@ export function TournamentList({ tournaments }: TournamentListProps) {
       {tournaments.map((tournament) => (
         <div
           key={tournament.id}
-          className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-accent/50"
+          className="flex flex-col items-start justify-between gap-4 rounded-lg border p-4 transition-colors hover:bg-accent/50 sm:flex-row sm:items-center"
         >
-          <div className="space-y-1">
+          <div className="w-full space-y-1 sm:w-auto">
             <Link
               to="/tournaments/$id"
               params={{ id: tournament.id }}
-              className="font-medium hover:underline"
+              className="line-clamp-1 font-medium hover:underline"
             >
               {tournament.title}
             </Link>
-            <p className="line-clamp-1 text-muted-foreground text-sm">
+            <p className="line-clamp-2 text-muted-foreground text-sm sm:line-clamp-1">
               {tournament.description || "No description"}
             </p>
-            <div className="flex gap-4 pt-1">
+            <div className="flex flex-wrap gap-4 pt-1">
               <div className="flex items-center text-muted-foreground text-sm">
-                <User className="mr-1 h-3 w-3" />
-                <span>{tournament.creator_id}</span>
+                <UserIcon className="mr-1 h-3 w-3 flex-shrink-0" />
+                <span className="max-w-[120px] truncate">
+                  {tournament.profiles.username || "N/A"}
+                </span>
               </div>
               <div className="flex items-center text-muted-foreground text-sm">
-                <Users className="mr-1 h-3 w-3" />
+                <Users className="mr-1 h-3 w-3 flex-shrink-0" />
                 <span>{tournament.max_participants} slots</span>
               </div>
               <div className="flex items-center text-muted-foreground text-sm">
-                <CalendarDays className="mr-1 h-3 w-3" />
+                <CalendarDays className="mr-1 h-3 w-3 flex-shrink-0" />
                 <span>
                   {new Date(tournament.created_at).toLocaleDateString()}
                 </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span
-              className={`rounded-full px-2 py-1 text-xs ${
-                tournament.registration_open
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400"
-                  : "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400"
-              }`}
-            >
-              {tournament.registration_open ? "Open" : "Closed"}
-            </span>
+          <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+            {tournament.registration_open ? (
+              <Badge variant="success">Open</Badge>
+            ) : (
+              <Badge variant="destructive">Closed</Badge>
+            )}
             <Button variant="outline" size="sm" asChild>
               <Link to="/tournaments/$id" params={{ id: tournament.id }}>
                 View
