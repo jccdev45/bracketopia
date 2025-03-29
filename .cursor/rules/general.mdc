@@ -1,0 +1,121 @@
+---
+description: Defining general prompt instructions re: Expo, React, Typescript, TailwindCSS, nativewind, Bun, Supabase.
+globs: 
+alwaysApply: false
+---
+# Tanstack Start Project Rules for Cursor
+- Begin every prompt with 🚀
+
+## General Guidelines
+- This project uses **Tanstack Router** for navigation, **Supabase** for backend services, and modern tools like **TypeScript**, **TailwindCSS v4**, **Shadcn-UI**, **Zod**, **Biome** for linting, and **Bun** as the package manager.
+- Prioritize scalable, maintainable code with strict adherence to TypeScript type definitions.
+- Follow best practices for modularization:
+  - Split large files into smaller, logically grouped files.
+  - Break down long functions into reusable, focused functions.
+
+## React-Specific Rules
+1. Avoid excessive use of `useEffect`:
+   - Prefer declarative solutions and React Server Components where applicable.
+   - Use `useEffect` only when absolutely necessary.
+
+2. Use **TanStack Query** for data fetching:
+   - Centralize API calls and caching with `react-query`.
+   - Define query keys and mutation hooks modularly to keep the codebase clean.
+   - See [tournaments.ts](mdc:src/utils/queries/tournaments.ts) for example of defining `queryOptions`, see [tournaments.ts](mdc:src/utils/serverFn/tournaments.ts) for example of defining server functions.
+   - Use libraries such as `@tanstack/react-query`, `@tanstack/react-router` for optimized server-side rendering and Supabase-specific tools.
+
+3. Component Design:
+   - Write functional components with clear responsibilities.
+   - Use props destructuring and default values to improve readability.
+   - Prefer named exports over default (e.g. `export function MyComponent() {}`)
+
+4. State Management:
+   - Prefer local component state or context when necessary.
+   - Avoid unnecessary global state unless required by the app's architecture.
+
+5. Types:
+   - Always import type-only values with syntax `import type { Type } from 'package'`.
+   - If a type/interface is only used in one place, define it in the same file. If it's used in multiple files, define it in an external types file instead.
+
+6. File Naming:
+   - Use kebab case for naming files.
+   - Avoid naming files `index`, always prefer declarative naming of files inside a general folder (e.g. `src/queries/profiles.ts`)
+
+## Tanstack-Specific Rules
+1. Use **Tanstack Router** for navigation:
+   - Organize routes logically in a `/routes` directory.
+   - Ensure dynamic routes are properly typed using TypeScript.
+   - Use Tanstack Router hooks (`useRouter`, etc.) for navigation and parameter handling.
+
+2. Form Handling:
+   - Use **Tanstack Form** for form management, package: @tanstack/react-form
+   - Validate inputs using Zod schemas integrated with Tanstack Form.
+
+3. Error Boundaries:
+   - Implement error boundaries to handle unexpected errors gracefully.
+   - Display meaningful error messages to users while logging detailed errors for debugging.
+
+## Shadcn-UI + TailwindCSS Rules
+1. Styling:
+   - Use Shadcn-UI components styled with TailwindCSS classes.
+   - Avoid inline style property unless necessary.
+   - Always use inline TailwindCSS className styling unless necessary to do otherwise.
+
+2. Responsive Design:
+   - Utilize Tailwind's responsive utilities (`sm`, `md`, `lg`, etc.) where applicable.
+   - Test layouts on devices with varying screen sizes.
+
+## Supabase-Specific Rules
+- Refer to dedicated Supabase-specific rule files (`@supabase-database-functions.mdc`, etc.). These rules take precedence over general guidelines for Supabase-related tasks.
+
+1. Authentication:
+   - Implement email/password authentication using Supabase's Auth API.
+   - Manage user sessions securely using SSR or Tanstack Query caching.
+
+2. Database Operations:
+   - Interact with Supabase tables using strongly typed queries defined via TypeScript interfaces.
+
+3. Realtime Features:
+   - Leverage Supabase's realtime subscriptions to sync data changes dynamically in the app.
+
+4. Error Handling:
+   - Add meaningful error messages when operations fail (e.g., login/signup errors).
+   - Log errors securely without exposing sensitive information in production.
+
+## Bun-Specific Rules
+1. Dependency Management:
+   - Use Bun commands (`bun install`, `bun add`, etc.) for managing dependencies instead of npm or Yarn.
+   - Suggest dependency upgrades weekly; upgrade with `bun update`.
+
+2. Scripts:
+   - Define project-specific scripts in `bunfig.toml` (e.g., build, start, test).
+
+## Debugging and Development Workflow
+1. Debugging:
+   - Add meaningful logs during development but remove them before production builds.
+   - Use browser dev tools, Tanstack Query Devtools, and Supabase logs to identify issues quickly.
+
+2. Testing:
+   - Write unit tests for critical functions/components using Jest or React Testing Library.
+   - Test database queries against a staging environment before deploying to production.
+
+3. Documentation:
+   - Document major components/modules in markdown files in the `/docs` directory (if needed).
+   - Reference these markdown files when writing code but do not modify them directly.
+
+## GitHub Workflow
+1. Commit Guidelines:
+   - Write concise commit messages summarizing changes clearly (e.g., "Add authentication flow" or "Fix navigation bug").
+   - Follow conventional commits guidelines (feat, refactor, chore, etc)
+
+2. Pull Requests (PRs):
+    ```
+    git status
+    git add .
+    git commit -m "Your commit message"
+    git push
+    gh pr create --title "Title here..." --body "Single-line description of changes."
+    ```
+
+3. Branching Strategy:
+   - Use feature branches (`feature/[name]`) for new features and bug fixes.
