@@ -1,23 +1,96 @@
+import { CategoryCombobox } from "@/components/form/category-combobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import type { TournamentCategory } from "@/constants/data";
+import { useFieldContext, useFormContext } from "@/context/form-context";
 import { type Updater, useStore } from "@tanstack/react-form";
-import type { VariantProps } from "class-variance-authority";
-import { useFieldContext, useFormContext } from "../../context/form-context";
 
-export function SubscribeButton({
+export function SliderField({
   label,
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof Button> & { label: string }) {
+  min,
+  max,
+  step = 1,
+}: {
+  label: string;
+  min: number;
+  max: number;
+  step?: number;
+}) {
+  const field = useFieldContext<number>();
+  const errors = useStore(field.store, (state) => state.meta.errors);
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={field.name}>
+        {label}: {field.state.value}
+      </Label>
+      <Slider
+        id={field.name}
+        name={field.name}
+        min={min}
+        max={max}
+        onValueChange={(values) => field.handleChange(values[0])}
+        step={step}
+        value={[field.state.value]}
+      />
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  );
+}
+
+export function CategoryField({ label }: { label: string }) {
+  const field = useFieldContext<TournamentCategory>();
+  const errors = useStore(field.store, (state) => state.meta.errors);
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <CategoryCombobox
+        value={field.state.value}
+        onChange={(value) => {
+          field.handleChange(value as TournamentCategory);
+          field.handleBlur();
+        }}
+      />
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  );
+}
+
+export function SwitchField({
+  label,
+}: {
+  label: string;
+}) {
+  const field = useFieldContext<boolean>();
+  const errors = useStore(field.store, (state) => state.meta.errors);
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <div className="flex items-center gap-2">
+        <Switch
+          id={field.name}
+          checked={field.state.value}
+          onCheckedChange={field.handleChange}
+        />
+        <span>{field.state.value ? "Open" : "Closed"}</span>
+      </div>
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  );
+}
+
+export function SubscribeButton({ label }: { label: string }) {
   const form = useFormContext();
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button
-          disabled={isSubmitting}
-          // previous style: className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
-        >
+        <Button type="submit" disabled={isSubmitting}>
           {label}
         </Button>
       )}
@@ -47,26 +120,24 @@ function ErrorMessages({
 export function TextField({
   label,
   placeholder,
-  type,
-}: React.ComponentProps<"input"> & { label: string }) {
+  type = "text",
+}: { label: string; placeholder?: string; type?: string }) {
   const field = useFieldContext<string>();
   const errors = useStore(field.store, (state) => state.meta.errors);
 
   return (
     <div className="space-y-2">
-      {/* previous label style: className="block font-bold mb-1 text-xl" */}
-      <Label htmlFor={label} className="grid">
-        {label}
-        <Input
-          value={field.state.value}
-          placeholder={placeholder}
-          onBlur={field.handleBlur}
-          type={type}
-          onChange={(e) => field.handleChange(e.target.value)}
-          className="w-full"
-          // previous style: className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </Label>
+      <Label htmlFor={field.name}>{label}</Label>
+      <Input
+        id={field.name}
+        name={field.name}
+        value={field.state.value}
+        placeholder={placeholder}
+        type={type}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        className="w-full"
+      />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
   );
@@ -75,6 +146,7 @@ export function TextField({
 export function TextArea({
   label,
   rows = 3,
+  placeholder,
 }: React.ComponentProps<"textarea"> & {
   label: string;
 }) {
@@ -83,15 +155,16 @@ export function TextArea({
 
   return (
     <div className="space-y-2">
-      {/* previous label style: className="block font-bold mb-1 text-xl" */}
-      <Label htmlFor={label} className="grid">
+      <Label htmlFor={field.name} className="grid">
         {label}
         <Textarea
+          id={field.name}
+          name={field.name}
           value={field.state.value}
+          placeholder={placeholder}
           onBlur={field.handleBlur}
           rows={rows}
           onChange={(e) => field.handleChange(e.target.value)}
-          // previous style: className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </Label>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
@@ -111,9 +184,9 @@ export function SelectField({
 
   return (
     <div className="grid gap-2">
-      {/* previous label style: className="block font-bold mb-1 text-xl" */}
-      <Label htmlFor={label}>{label}</Label>
+      <Label htmlFor={field.name}>{label}</Label>
       <select
+        id={field.name}
         name={field.name}
         value={field.state.value}
         onBlur={field.handleBlur}

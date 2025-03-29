@@ -240,10 +240,11 @@ export const addTournamentFn = createServerFn({ method: "POST" })
       .from("tournaments")
       .insert({
         title: data.title,
-        description: data.description || null,
+        description: data.description || `Description for: ${data.title}`,
         max_participants: data.max_participants,
         creator_id: data.creator_id,
-        registration_open: data.registration_open || true,
+        registration_open: data.registration_open,
+        category: data.category,
       })
       .select()
       .single();

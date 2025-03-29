@@ -1,6 +1,3 @@
-import { CategoryCombobox } from "@/components/form/category-combobox";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,32 +6,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+import { useAppForm } from "@/hooks/use-app-form";
 import { tournamentCreateSchema } from "@/schema/tournament";
 import { addTournamentFormOpts } from "@/utils/form/form-options";
 import { tournamentQueryOptions } from "@/utils/queries/tournaments";
 import { addTournamentFn } from "@/utils/serverFn/tournaments";
-import { useForm } from "@tanstack/react-form";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authed/tournaments_/create/")({
   beforeLoad: async ({ context }) => {
     await context.queryClient.ensureQueryData(tournamentQueryOptions.form());
   },
-  component: RouteComponent,
+  component: TournamentCreate,
 });
 
-function RouteComponent() {
+function TournamentCreate() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
-  const [maxParticipantValue, setMaxParticipantValue] = useState([8]); // Correct initial value
   const { data: tournaments } = useSuspenseQuery(tournamentQueryOptions.form());
 
   const createTournamentMutation = useMutation({
@@ -51,47 +41,30 @@ function RouteComponent() {
     },
   });
 
-  const form = useForm({
+  const form = useAppForm({
     ...addTournamentFormOpts,
-    // Server-side validation and Zod schema validation
     validators: {
       onSubmitAsync: async ({ value }) => {
-        //First, zod validation
-        const result = tournamentCreateSchema.safeParse(value);
-        if (!result.success) {
-          const errors: { fields: Record<string, string> } = {
-            fields: {},
-          };
-          for (const issue of result.error.issues) {
-            errors.fields[issue.path.join(".")] = issue.message;
-          }
-
-          return errors;
-        }
-        // Server-side validation (check for duplicate name)
+        // Check for duplicate name
         const existingTournament = tournaments.find(
           (name) => name.title === value.title,
         );
         if (existingTournament) {
           return {
             fields: {
-              title: "Tournament name already exists!", // Set the error *message* directly
+              title: "Tournament name already exists!",
             },
           };
         }
-        //If no errors during async validation, the form is valid
         return null;
       },
+      onBlur: tournamentCreateSchema,
     },
     onSubmit: async ({ value }) => {
-      // onSubmit is only run if validation is OK
       await createTournamentMutation.mutateAsync({
         data: {
           ...value,
-          max_participants: maxParticipantValue[0],
           creator_id: user?.id as string,
-          registration_open: value.registration_open,
-          category: value.category,
         },
       });
     },
@@ -116,122 +89,49 @@ function RouteComponent() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <form.Field
+            <form.AppField
               name="title"
               children={(field) => (
-                <>
-                  <Label htmlFor={field.name} className="grid">
-                    Tournament Title
-                  </Label>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Enter tournament title"
-                    value={field.state.value}
-                  />
-
-                  {field.state.meta.errors?.length ? (
-                    <Alert>{field.state.meta.errors.join(", ")}</Alert>
-                  ) : null}
-                </>
+                <field.TextField
+                  label="Tournament Title"
+                  placeholder="Enter tournament title"
+                />
               )}
             />
-            <form.Field
+            <form.AppField
               name="description"
               children={(field) => (
-                <>
-                  <Label htmlFor={field.name} className="grid">
-                    Description
-                  </Label>
-                  <Textarea
-                    id={field.name}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Enter tournament description"
-                    rows={3}
-                    value={field.state.value}
-                  />
-                  {field.state.meta.errors?.length ? (
-                    <Alert>{field.state.meta.errors.join(", ")}</Alert>
-                  ) : null}
-                </>
+                <field.TextArea
+                  label="Description"
+                  placeholder="Enter tournament description"
+                  rows={3}
+                />
               )}
             />
-            <form.Field
+
+            <form.AppField
               name="category"
+              children={(field) => <field.CategoryField label="Category" />}
+            />
+
+            <form.AppField
+              name="max_participants"
               children={(field) => (
-                <>
-                  <Label htmlFor={field.name} className="grid">
-                    Category
-                  </Label>
-                  <CategoryCombobox
-                    value={field.state.value}
-                    onChange={(value) => {
-                      field.handleChange(value as typeof field.state.value);
-                      field.handleBlur();
-                    }}
-                  />
-                  {field.state.meta.errors?.length ? (
-                    <Alert>{field.state.meta.errors.join(", ")}</Alert>
-                  ) : null}
-                </>
+                <field.SliderField label="Max Participants" min={2} max={100} />
               )}
             />
-            <form.Field
-              name="max_participants" // This field is just for visual representation
-              children={(field) => (
-                <>
-                  <Label htmlFor={field.name} className="grid">
-                    Max Participants: {maxParticipantValue}
-                  </Label>
-                  <Slider
-                    id={field.name}
-                    max={100}
-                    min={2}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onValueChange={setMaxParticipantValue}
-                    step={1}
-                    value={maxParticipantValue}
-                  />
-                  {field.state.meta.errors?.length ? (
-                    <Alert>{field.state.meta.errors.join(", ")}</Alert>
-                  ) : null}
-                </>
-              )}
-            />
-            <form.Field
+
+            <form.AppField
               name="registration_open"
               children={(field) => (
-                <>
-                  <Label htmlFor={field.name}>Registration Status</Label>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      id={field.name}
-                      name={field.name}
-                      checked={field.state.value}
-                      onCheckedChange={field.handleChange}
-                    />
-                    <span>{field.state.value ? "Open" : "Closed"}</span>
-                  </div>
-                  {field.state.meta.errors?.length ? (
-                    <Alert>{field.state.meta.errors.join(", ")}</Alert>
-                  ) : null}
-                </>
+                <field.SwitchField label="Registration Status" />
               )}
             />
           </CardContent>
           <CardFooter>
-            <form.Subscribe>
-              {(state) => (
-                <Button disabled={state.isSubmitting} type="submit">
-                  Create Tournament
-                </Button>
-              )}
-            </form.Subscribe>
+            <form.AppForm>
+              <form.SubscribeButton label="Create Tournament" />
+            </form.AppForm>
           </CardFooter>
         </Card>
       </form>

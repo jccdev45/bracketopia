@@ -9,10 +9,7 @@ export const tournamentCreateSchema = z.object({
     .string()
     .min(1, "Title is required")
     .max(100, "Must be less than 100 characters"),
-  description: z
-    .string()
-    .max(500, "Must be less than 500 characters")
-    .optional(),
+  description: z.string().max(500, "Must be less than 500 characters"),
   max_participants: z
     .number()
     .min(2, "Must have at least 2 participants")
