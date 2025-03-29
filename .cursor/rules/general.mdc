@@ -57,8 +57,8 @@ alwaysApply: false
 
 ## Shadcn-UI + TailwindCSS Rules
 1. Styling:
-   - Use Shadcn-UI components styled with TailwindCSS classes.
-   - Avoid inline style property unless necessary.
+   - Use Shadcn-UI components styled with TailwindCSS classes. Ensure any additional styling doesn't overlap (or cause duplication) with the default styling of the components in the `/components/ui` folder.
+   - Avoid inline style property unless necessary, for styles that aren't achivevable with pure Tailwind classes
    - Always use inline TailwindCSS className styling unless necessary to do otherwise.
 
 2. Responsive Design:
