@@ -58,7 +58,8 @@ export const fetchTournamentsFn = createServerFn({
         max_participants,
         creator_id,
         created_at,
-        updated_at
+        updated_at,
+        category
       `,
     )
     .limit(10)
@@ -125,6 +126,7 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
         registration_open,
         created_at,
         updated_at,
+        category,
         profiles (
           id,
           username,
@@ -249,22 +251,25 @@ export const addTournamentFn = createServerFn({ method: "POST" })
     };
   });
 
-export const fetchTournamentNamesFn = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase.from("tournaments").select("title");
+export const fetchTournamentFormInfoFn = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("tournaments").select(`
+      title,
+      category
+    `);
 
-    if (error) {
-      console.error("Supabase error: ", error);
-      throw new TournamentError(
-        "Unable to retrieve tournament names.",
-        "TOURNAMENT_NAMES_FETCH_FAILED",
-      );
-    }
+  if (error) {
+    console.error("Supabase error: ", error);
+    throw new TournamentError(
+      "Unable to retrieve tournament names.",
+      "TOURNAMENT_NAMES_FETCH_FAILED",
+    );
+  }
 
-    return data;
-  },
-);
+  return data;
+});
 
 // NOTE: temp function to manually bulk edit incorrect seeded data 😬
 // export const tempUpdateTournamentFn = createServerFn({

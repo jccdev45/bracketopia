@@ -1,3 +1,7 @@
+import {
+  TOURNAMENT_CATEGORIES,
+  type TournamentCategory,
+} from "@/constants/data";
 import { formOptions } from "@tanstack/react-form";
 
 const sharedOpts = {
@@ -25,5 +29,6 @@ export const addTournamentFormOpts = formOptions({
     description: "",
     max_participants: 8,
     registration_open: true,
+    category: TOURNAMENT_CATEGORIES[0] as TournamentCategory,
   },
 });

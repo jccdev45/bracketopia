@@ -45,3 +45,17 @@ export const FEATURES: Feature[] = [
     icon: Logs,
   },
 ];
+
+export const TOURNAMENT_CATEGORIES = [
+  "General",
+  "Video Games",
+  "Music",
+  "Sports",
+  "Esports",
+  "Academic",
+  "Board Games",
+  "Card Games",
+  "Other",
+] as const;
+
+export type TournamentCategory = (typeof TOURNAMENT_CATEGORIES)[number];

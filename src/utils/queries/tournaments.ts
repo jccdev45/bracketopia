@@ -1,7 +1,7 @@
 import { QUERY_CACHE_TIMES } from "@/constants/query-constants";
 import {
   fetchTournamentFn,
-  fetchTournamentNamesFn,
+  fetchTournamentFormInfoFn,
   fetchTournamentStatsFn,
   fetchTournamentsWithProfileFn,
 } from "@/utils/serverFn/tournaments";
@@ -28,10 +28,10 @@ export const tournamentQueryOptions = {
       queryFn: async () => fetchTournamentStatsFn(),
       staleTime: ONE_MINUTE,
     }),
-  titles: () =>
+  form: () =>
     queryOptions({
       queryKey: ["tournaments", "titles"],
-      queryFn: async () => fetchTournamentNamesFn(),
+      queryFn: async () => fetchTournamentFormInfoFn(),
       staleTime: FIFTEEN_MINUTES,
     }),
 };

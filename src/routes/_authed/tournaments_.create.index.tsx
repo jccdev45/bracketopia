@@ -1,3 +1,4 @@
+import { CategoryCombobox } from "@/components/form/category-combobox";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { tournamentCreateSchema } from "@/schema/tournament";
 import { addTournamentFormOpts } from "@/utils/form/form-options";
@@ -25,7 +26,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authed/tournaments_/create/")({
   beforeLoad: async ({ context }) => {
-    await context.queryClient.ensureQueryData(tournamentQueryOptions.titles());
+    await context.queryClient.ensureQueryData(tournamentQueryOptions.form());
   },
   component: RouteComponent,
 });
@@ -34,9 +35,7 @@ function RouteComponent() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const [maxParticipantValue, setMaxParticipantValue] = useState([8]); // Correct initial value
-  const { data: tournamentNames } = useSuspenseQuery(
-    tournamentQueryOptions.titles(),
-  );
+  const { data: tournaments } = useSuspenseQuery(tournamentQueryOptions.form());
 
   const createTournamentMutation = useMutation({
     mutationFn: addTournamentFn,
@@ -70,7 +69,7 @@ function RouteComponent() {
           return errors;
         }
         // Server-side validation (check for duplicate name)
-        const existingTournament = tournamentNames.find(
+        const existingTournament = tournaments.find(
           (name) => name.title === value.title,
         );
         if (existingTournament) {
@@ -89,9 +88,10 @@ function RouteComponent() {
       await createTournamentMutation.mutateAsync({
         data: {
           ...value,
-          max_participants: maxParticipantValue[0], // Use the slider value
+          max_participants: maxParticipantValue[0],
           creator_id: user?.id as string,
           registration_open: value.registration_open,
+          category: value.category,
         },
       });
     },
@@ -161,6 +161,26 @@ function RouteComponent() {
               )}
             />
             <form.Field
+              name="category"
+              children={(field) => (
+                <>
+                  <Label htmlFor={field.name} className="grid">
+                    Category
+                  </Label>
+                  <CategoryCombobox
+                    value={field.state.value}
+                    onChange={(value) => {
+                      field.handleChange(value as typeof field.state.value);
+                      field.handleBlur();
+                    }}
+                  />
+                  {field.state.meta.errors?.length ? (
+                    <Alert>{field.state.meta.errors.join(", ")}</Alert>
+                  ) : null}
+                </>
+              )}
+            />
+            <form.Field
               name="max_participants" // This field is just for visual representation
               children={(field) => (
                 <>
@@ -183,29 +203,20 @@ function RouteComponent() {
                 </>
               )}
             />
-
             <form.Field
               name="registration_open"
               children={(field) => (
                 <>
                   <Label htmlFor={field.name}>Registration Status</Label>
-                  <RadioGroup
-                    defaultValue={field.state.value ? "open" : "closed"}
-                    className="w-fit"
-                    name={field.name}
-                    onValueChange={(value) =>
-                      field.handleChange(value === "open")
-                    }
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      Open
-                      <RadioGroupItem value="open" id="open" />
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      Closed
-                      <RadioGroupItem value="closed" id="closed" />
-                    </div>
-                  </RadioGroup>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id={field.name}
+                      name={field.name}
+                      checked={field.state.value}
+                      onCheckedChange={field.handleChange}
+                    />
+                    <span>{field.state.value ? "Open" : "Closed"}</span>
+                  </div>
                   {field.state.meta.errors?.length ? (
                     <Alert>{field.state.meta.errors.join(", ")}</Alert>
                   ) : null}

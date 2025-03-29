@@ -1,14 +1,14 @@
 import { TournamentBrackets } from "@/components/tournament/tournament-brackets";
 import { TournamentModerators } from "@/components/tournament/tournament-moderators";
 import { TournamentParticipants } from "@/components/tournament/tournament-participants";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { TournamentWithDetails } from "@/types/tournament.types";
 import { fetchTournamentFn } from "@/utils/serverFn/tournaments";
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, Trophy, Users } from "lucide-react";
+import { CalendarDays, ChartBarStacked, Trophy, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authed/tournaments/$id")({
   component: RouteComponent,
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authed/tournaments/$id")({
     if ("error" in tournament) {
       throw new Error("Failed to load tournament");
     }
-    return tournament as TournamentWithDetails;
+    return tournament;
   },
 });
 
@@ -37,19 +37,22 @@ function RouteComponent() {
             </Button>
           </div>
           <div className="flex items-center space-x-6 text-muted-foreground text-sm">
-            <div className="flex items-center">
-              <Users className="mr-2 h-4 w-4" />
+            <Badge>
+              <ChartBarStacked className="size-4" /> {tournament.category}
+            </Badge>
+            <div className="flex items-center gap-2">
+              <Users className="size-4" />
               <span>{tournament.max_participants} participants maximum</span>
             </div>
-            <div className="flex items-center">
-              <CalendarDays className="mr-2 h-4 w-4" />
+            <div className="flex items-center gap-2">
+              <CalendarDays className="size-4" />
               <span>
                 Created on{" "}
                 {new Date(tournament.created_at).toLocaleDateString()}
               </span>
             </div>
-            <div className="flex items-center">
-              <Trophy className="mr-2 h-4 w-4" />
+            <div className="flex items-center gap-2">
+              <Trophy className="size-4" />
               <span>Single Elimination</span>
             </div>
           </div>
