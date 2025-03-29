@@ -1,13 +1,31 @@
 import { CategoryCombobox } from "@/components/form/category-combobox";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { TournamentCategory } from "@/constants/data";
 import { useFieldContext, useFormContext } from "@/context/form-context";
-import { type Updater, useStore } from "@tanstack/react-form";
+import { cn } from "@/lib/utils";
+import { useStore } from "@tanstack/react-form";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 export function SliderField({
   label,
@@ -121,7 +139,12 @@ export function TextField({
   label,
   placeholder,
   type = "text",
-}: { label: string; placeholder?: string; type?: string }) {
+  ...props
+}: {
+  label: string;
+  placeholder?: string;
+  type?: string;
+} & React.InputHTMLAttributes<HTMLInputElement>) {
   const field = useFieldContext<string>();
   const errors = useStore(field.store, (state) => state.meta.errors);
 
@@ -137,6 +160,7 @@ export function TextField({
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         className="w-full"
+        {...props}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
@@ -174,10 +198,12 @@ export function TextArea({
 
 export function SelectField({
   label,
-  children,
+  values,
+  placeholder,
 }: React.ComponentProps<"select"> & {
   label: string;
-  children: React.ReactNode;
+  placeholder: string;
+  values: Array<{ value: string; label: string }>;
 }) {
   const field = useFieldContext<string>();
   const errors = useStore(field.store, (state) => state.meta.errors);
@@ -185,18 +211,107 @@ export function SelectField({
   return (
     <div className="grid gap-2">
       <Label htmlFor={field.name}>{label}</Label>
-      <select
-        id={field.name}
+      <Select
         name={field.name}
         value={field.state.value}
-        onBlur={field.handleBlur}
-        onChange={(e: { target: { value: Updater<string> } }) =>
-          field.handleChange(e.target.value)
-        }
-        className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        onValueChange={(value) => field.handleChange(value)}
       >
-        {children}
-      </select>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>{label}</SelectLabel>
+            {values.map((value) => (
+              <SelectItem key={value.value} value={value.value}>
+                {value.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+    </div>
+  );
+}
+
+export function DateTimeField({
+  label,
+  description,
+}: {
+  label: string;
+  description?: string;
+}) {
+  const field = useFieldContext<string | null>();
+  const errors = useStore(field.store, (state) => state.meta.errors);
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !field.state.value && "text-muted-foreground",
+            )}
+          >
+            {field.state.value ? (
+              format(new Date(field.state.value), "PPP p")
+            ) : (
+              <span>Pick a date and time</span>
+            )}
+            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <div className="p-3">
+            <Calendar
+              mode="single"
+              selected={
+                field.state.value ? new Date(field.state.value) : undefined
+              }
+              onSelect={(date) => {
+                if (date) {
+                  // Preserve the current time if there's an existing value
+                  const currentDate = field.state.value
+                    ? new Date(field.state.value)
+                    : new Date();
+                  date.setHours(currentDate.getHours());
+                  date.setMinutes(currentDate.getMinutes());
+                  field.handleChange(date.toISOString());
+                } else {
+                  field.handleChange(null);
+                }
+              }}
+              initialFocus
+            />
+            <div className="mt-3">
+              <Input
+                type="time"
+                value={
+                  field.state.value
+                    ? format(new Date(field.state.value), "HH:mm")
+                    : ""
+                }
+                onChange={(e) => {
+                  const [hours, minutes] = e.target.value.split(":");
+                  const date = field.state.value
+                    ? new Date(field.state.value)
+                    : new Date();
+                  date.setHours(Number.parseInt(hours, 10));
+                  date.setMinutes(Number.parseInt(minutes, 10));
+                  field.handleChange(date.toISOString());
+                }}
+              />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+      {description && (
+        <p className="text-muted-foreground text-sm">{description}</p>
+      )}
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
   );

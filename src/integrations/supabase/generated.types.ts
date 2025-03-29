@@ -275,35 +275,53 @@ export type Database = {
       }
       tournaments: {
         Row: {
+          best_of: number | null
           category: string
           created_at: string
           creator_id: string
           description: string | null
+          end_date: string | null
+          format: string
           id: string
+          join_type: string
           max_participants: number
           registration_open: boolean
+          scoring_type: string
+          start_date: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          best_of?: number | null
           category?: string
           created_at?: string
           creator_id: string
           description?: string | null
+          end_date?: string | null
+          format?: string
           id?: string
+          join_type?: string
           max_participants: number
           registration_open?: boolean
+          scoring_type?: string
+          start_date?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          best_of?: number | null
           category?: string
           created_at?: string
           creator_id?: string
           description?: string | null
+          end_date?: string | null
+          format?: string
           id?: string
+          join_type?: string
           max_participants?: number
           registration_open?: boolean
+          scoring_type?: string
+          start_date?: string | null
           title?: string
           updated_at?: string
         }

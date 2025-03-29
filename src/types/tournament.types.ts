@@ -8,7 +8,19 @@ import type { ModeratorWithProfile } from "@/types/moderator.types";
 import type { ParticipantWithProfile } from "@/types/participant.types";
 import type { Profile } from "@/types/profile.types";
 
-export type Tournament = Tables<"tournaments">;
+export type TournamentFormat =
+  | "single_elimination"
+  | "double_elimination"
+  | "round_robin";
+export type TournamentScoringType = "single" | "best_of";
+export type TournamentJoinType = "open" | "approval" | "invite";
+
+export type Tournament = Tables<"tournaments"> & {
+  format: TournamentFormat;
+  scoring_type: TournamentScoringType;
+  join_type: TournamentJoinType;
+};
+
 export type TournamentInsert = TablesInsert<"tournaments">;
 export type TournamentUpdate = TablesUpdate<"tournaments">;
 
@@ -22,6 +34,7 @@ export type TournamentWithDetails = Tournament & {
   brackets: BracketWithStructure[];
   creator: Profile;
 };
+
 export interface TournamentStats {
   totalParticipantSlots: number;
   totalTournaments: number;

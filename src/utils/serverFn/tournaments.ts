@@ -245,6 +245,12 @@ export const addTournamentFn = createServerFn({ method: "POST" })
         creator_id: data.creator_id,
         registration_open: data.registration_open,
         category: data.category,
+        format: data.format,
+        scoring_type: data.scoring_type,
+        best_of: data.best_of,
+        start_date: data.start_date,
+        end_date: data.end_date,
+        join_type: data.join_type,
       })
       .select()
       .single();

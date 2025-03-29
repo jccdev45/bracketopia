@@ -21,6 +21,19 @@ export const tournamentCreateSchema = z.object({
     }),
     z.string().min(1, "Please select a category"),
   ]),
+  format: z.enum([
+    "single_elimination",
+    "double_elimination",
+    "round_robin",
+  ] as const),
+  scoring_type: z.enum(["single", "best_of"] as const),
+  best_of: z.union([
+    z.literal(null),
+    z.union([z.literal(3), z.literal(5), z.literal(7)]),
+  ]),
+  start_date: z.union([z.literal(null), z.string()]),
+  end_date: z.union([z.literal(null), z.string()]),
+  join_type: z.enum(["open", "approval", "invite"] as const),
 });
 
 export type TournamentCreateSchemaValues = z.infer<
