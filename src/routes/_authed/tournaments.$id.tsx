@@ -6,10 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { TournamentWithDetails } from "@/types/tournament.types";
 import { tournamentQueryOptions } from "@/utils/queries/tournaments";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, ChartBarStacked, Trophy, Users } from "lucide-react";
+import { format } from "date-fns";
+import {
+  ChartBarStacked,
+  Clock,
+  Crown,
+  ShieldCheck,
+  Trophy,
+  UserPlus,
+  Users,
+  Users2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authed/tournaments/$id")({
   component: RouteComponent,
@@ -22,65 +33,159 @@ export const Route = createFileRoute("/_authed/tournaments/$id")({
 
 function RouteComponent() {
   const { id } = Route.useParams();
-  const { data: tournament } = useSuspenseQuery(
-    tournamentQueryOptions.detail(id),
-  );
+  const { data } = useSuspenseQuery(tournamentQueryOptions.detail(id));
+  const tournament = data as TournamentWithDetails;
+
+  const formatName = (format: string) => {
+    switch (format) {
+      case "single_elimination":
+        return "Single Elimination";
+      case "double_elimination":
+        return "Double Elimination";
+      case "round_robin":
+        return "Round Robin";
+      default:
+        return format;
+    }
+  };
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b">
-        <div className="px-6 py-4">
-          <div className="mb-4 flex items-center justify-between">
-            <h1 className="font-bold text-2xl">{tournament.title}</h1>
-            <Button variant="outline">
-              {tournament.registration_open
-                ? "Registration Open"
-                : "Registration Closed"}
+      <div className="border-b bg-card">
+        <div className="container px-6 py-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <h1 className="font-bold text-3xl">{tournament.title}</h1>
+              {tournament.description && (
+                <p className="text-muted-foreground">
+                  {tournament.description}
+                </p>
+              )}
+            </div>
+            <Button
+              variant={tournament.registration_open ? "default" : "secondary"}
+            >
+              {tournament.registration_open ? (
+                <>
+                  <UserPlus className="mr-2 size-4" />
+                  Join Tournament
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="mr-2 size-4" />
+                  Registration Closed
+                </>
+              )}
             </Button>
           </div>
-          <div className="flex items-center space-x-6 text-muted-foreground text-sm">
-            <Badge>
-              <ChartBarStacked className="size-4" /> {tournament.category}
-            </Badge>
-            <div className="flex items-center gap-2">
-              <Users className="size-4" />
-              <span>{tournament.max_participants} participants maximum</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CalendarDays className="size-4" />
-              <span>
-                Created on{" "}
-                {new Date(tournament.created_at).toLocaleDateString()}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Trophy className="size-4" />
-              <span>Single Elimination</span>
-            </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-2">
+                  <Trophy className="size-5 text-primary" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium text-sm">Format</p>
+                    <p className="text-muted-foreground text-sm">
+                      {formatName(tournament.format)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-2">
+                  <Crown className="size-5 text-primary" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium text-sm">Scoring</p>
+                    <p className="text-muted-foreground text-sm">
+                      {tournament.scoring_type === "single"
+                        ? "Single Match"
+                        : `Best of ${tournament.best_of}`}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-2">
+                  <Users2 className="size-5 text-primary" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium text-sm">Participants</p>
+                    <p className="text-muted-foreground text-sm">
+                      {tournament.participants?.length || 0} /{" "}
+                      {tournament.max_participants}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-2">
+                  <Clock className="size-5 text-primary" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium text-sm">Schedule</p>
+                    <p className="text-muted-foreground text-sm">
+                      {tournament.start_date
+                        ? format(
+                            new Date(tournament.start_date),
+                            "MMM d, h:mm a",
+                          )
+                        : "Not scheduled"}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          {tournament.description && (
-            <p className="mt-4 text-muted-foreground text-sm">
-              {tournament.description}
-            </p>
-          )}
         </div>
       </div>
 
-      <div className="flex-1 p-6">
+      <div className="container flex-1 px-6 py-6">
         <Tabs defaultValue="participants" className="flex h-full flex-col">
-          <TabsList>
-            <TabsTrigger value="participants">Participants</TabsTrigger>
-            <TabsTrigger value="brackets">Brackets</TabsTrigger>
-            <TabsTrigger value="moderators">Moderators</TabsTrigger>
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="participants" className="flex items-center">
+              <Users className="mr-2 size-4" />
+              Participants
+            </TabsTrigger>
+            <TabsTrigger value="brackets" className="flex items-center">
+              <ChartBarStacked className="mr-2 size-4" />
+              Brackets
+            </TabsTrigger>
+            <TabsTrigger value="moderators" className="flex items-center">
+              <ShieldCheck className="mr-2 size-4" />
+              Moderators
+            </TabsTrigger>
           </TabsList>
           <ScrollArea className="flex-1">
             <TabsContent value="participants" className="mt-4 h-full">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg">
                     Participants ({tournament.participants?.length || 0}/
                     {tournament.max_participants})
                   </CardTitle>
+                  <Badge
+                    variant={
+                      tournament.join_type === "open"
+                        ? "default"
+                        : tournament.join_type === "approval"
+                          ? "secondary"
+                          : "outline"
+                    }
+                  >
+                    {tournament.join_type === "open"
+                      ? "Open Registration"
+                      : tournament.join_type === "approval"
+                        ? "Approval Required"
+                        : "Invite Only"}
+                  </Badge>
                 </CardHeader>
                 <CardContent>
                   <TournamentParticipants
@@ -91,20 +196,18 @@ function RouteComponent() {
             </TabsContent>
             <TabsContent value="brackets" className="mt-4">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg">Tournament Brackets</CardTitle>
+                  <Badge>
+                    {tournament.format === "single_elimination"
+                      ? "Single Elimination"
+                      : tournament.format === "double_elimination"
+                        ? "Double Elimination"
+                        : "Round Robin"}
+                  </Badge>
                 </CardHeader>
                 <CardContent>
-                  <TournamentBrackets
-                    tournamentId={tournament.id}
-                    // brackets={tournament.brackets}
-                    // participants={
-                    //   tournament.participants?.map((p) => ({
-                    //     id: p.id,
-                    //     user_id: p.user_id,
-                    //   })) || []
-                    // }
-                  />
+                  <TournamentBrackets tournamentId={tournament.id} />
                 </CardContent>
               </Card>
             </TabsContent>

@@ -2,7 +2,13 @@ import { createClient } from "@/integrations/supabase/server";
 import type { ModeratorWithProfile } from "@/types/moderator.types";
 import type { ParticipantWithProfile } from "@/types/participant.types";
 import type { Profile } from "@/types/profile.types";
-import type { Tournament, TournamentInsert } from "@/types/tournament.types";
+import type {
+  Tournament,
+  TournamentFormat,
+  TournamentInsert,
+  TournamentJoinType,
+  TournamentScoringType,
+} from "@/types/tournament.types";
 import { parseStructure } from "@/utils/helpers/brackets";
 import { createServerFn } from "@tanstack/react-start";
 // NOTE: for temp function
@@ -131,15 +137,7 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
       .from("tournaments")
       .select(
         `
-        id,
-        creator_id,
-        title,
-        description,
-        max_participants,
-        registration_open,
-        created_at,
-        updated_at,
-        category,
+        *,
         profiles (
           id,
           username,
@@ -218,6 +216,9 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
         : [],
       participants: (participants as ParticipantWithProfile[]) || [],
       moderators: (moderators as ModeratorWithProfile[]) || [],
+      format: tournamentData.format as TournamentFormat,
+      scoring_type: tournamentData.scoring_type as TournamentScoringType,
+      join_type: tournamentData.join_type as TournamentJoinType,
     };
 
     return formattedTournamentData;
