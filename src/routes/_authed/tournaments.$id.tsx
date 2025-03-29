@@ -6,23 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchTournamentFn } from "@/utils/serverFn/tournaments";
+import { tournamentQueryOptions } from "@/utils/queries/tournaments";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { CalendarDays, ChartBarStacked, Trophy, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authed/tournaments/$id")({
   component: RouteComponent,
-  loader: async ({ params: { id } }) => {
-    const tournament = await fetchTournamentFn({ data: id });
-    if ("error" in tournament) {
-      throw new Error("Failed to load tournament");
-    }
-    return tournament;
+  beforeLoad: async ({ context, params: { id } }) => {
+    await context.queryClient.ensureQueryData(
+      tournamentQueryOptions.detail(id),
+    );
   },
 });
 
 function RouteComponent() {
-  const tournament = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const { data: tournament } = useSuspenseQuery(
+    tournamentQueryOptions.detail(id),
+  );
 
   return (
     <div className="flex h-full flex-col">
