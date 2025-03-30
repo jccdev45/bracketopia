@@ -3,7 +3,7 @@ import { TournamentModerators } from "@/components/tournament/tournament-moderat
 import { TournamentParticipants } from "@/components/tournament/tournament-participants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { TournamentWithDetails } from "@/types/tournament.types";
@@ -165,63 +165,50 @@ function RouteComponent() {
           </TabsList>
           <ScrollArea className="flex-1">
             <TabsContent value="participants" className="mt-4 h-full">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg">
-                    Participants ({tournament.participants?.length || 0}/
-                    {tournament.max_participants})
-                  </CardTitle>
-                  <Badge
-                    variant={
-                      tournament.join_type === "open"
-                        ? "default"
-                        : tournament.join_type === "approval"
-                          ? "secondary"
-                          : "outline"
-                    }
-                  >
-                    {tournament.join_type === "open"
-                      ? "Open Registration"
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold text-lg">
+                  {tournament.participants?.length || 0}/
+                  {tournament.max_participants} Participants
+                </h2>
+                <Badge
+                  variant={
+                    tournament.join_type === "open"
+                      ? "default"
                       : tournament.join_type === "approval"
-                        ? "Approval Required"
-                        : "Invite Only"}
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  <TournamentParticipants
-                    participants={tournament.participants}
-                  />
-                </CardContent>
-              </Card>
+                        ? "secondary"
+                        : "outline"
+                  }
+                >
+                  {tournament.join_type === "open"
+                    ? "Open Registration"
+                    : tournament.join_type === "approval"
+                      ? "Approval Required"
+                      : "Invite Only"}
+                </Badge>
+              </div>
+              <TournamentParticipants participants={tournament.participants} />
             </TabsContent>
             <TabsContent value="brackets" className="mt-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg">Tournament Brackets</CardTitle>
-                  <Badge>
-                    {tournament.format === "single_elimination"
-                      ? "Single Elimination"
-                      : tournament.format === "double_elimination"
-                        ? "Double Elimination"
-                        : "Round Robin"}
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  <TournamentBrackets tournamentId={tournament.id} />
-                </CardContent>
-              </Card>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold text-lg">Tournament Brackets</h2>
+                <Badge>
+                  {tournament.format === "single_elimination"
+                    ? "Single Elimination"
+                    : tournament.format === "double_elimination"
+                      ? "Double Elimination"
+                      : "Round Robin"}
+                </Badge>
+              </div>
+              <TournamentBrackets tournamentId={tournament.id} />
             </TabsContent>
             <TabsContent value="moderators" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    Tournament Moderators
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TournamentModerators moderators={tournament.moderators} />
-                </CardContent>
-              </Card>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold text-lg">Tournament Moderators</h2>
+                <Badge variant="outline">
+                  {tournament.moderators.length} Moderators
+                </Badge>
+              </div>
+              <TournamentModerators moderators={tournament.moderators} />
             </TabsContent>
           </ScrollArea>
         </Tabs>

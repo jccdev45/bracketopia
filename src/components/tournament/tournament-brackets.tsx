@@ -81,7 +81,7 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
 
   if (isBracketLoading || isParticipantsLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
+      <div className="flex h-24 items-center justify-center rounded-lg border">
         <p className="text-muted-foreground">Loading tournament data...</p>
       </div>
     );
@@ -89,12 +89,10 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
 
   if (isBracketError || isParticipantsError) {
     const errorMessage = isBracketError
-      ? `Bracket Error: ${(bracketError as Error)?.message}` // Cast to Error
-      : `Participant Error: ${
-          (participantsError as Error)?.message // Cast to Error
-        }`;
+      ? `Bracket Error: ${(bracketError as Error)?.message}`
+      : `Participant Error: ${(participantsError as Error)?.message}`;
     return (
-      <div className="flex flex-col items-center justify-center p-8">
+      <div className="flex h-24 flex-col items-center justify-center rounded-lg border p-4">
         <p className="mb-4 text-muted-foreground">
           Error loading tournament data: {errorMessage}
         </p>
@@ -116,7 +114,7 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
 
   if (!bracketData) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
+      <div className="flex h-24 flex-col items-center justify-center rounded-lg border p-4">
         <p className="mb-4 text-muted-foreground">
           No brackets have been generated yet. (Participants:{" "}
           {participants.length})
@@ -136,8 +134,10 @@ export function TournamentBrackets({ tournamentId }: TournamentBracketsProps) {
   }
 
   return (
-    <ScrollArea className="h-[600px]">
-      <BracketView bracket={bracketData} onUpdateMatch={handleUpdateMatch} />
-    </ScrollArea>
+    <div className="rounded-lg border">
+      <ScrollArea className="h-[600px] p-4">
+        <BracketView bracket={bracketData} onUpdateMatch={handleUpdateMatch} />
+      </ScrollArea>
+    </div>
   );
 }
