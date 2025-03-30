@@ -19,6 +19,25 @@ export const fetchProfileFn = createServerFn({ method: "GET" })
     return profileData;
   });
 
+export const searchProfilesFn = createServerFn({ method: "GET" })
+  .validator((d: { query: string; excludeIds?: string[] }) => d)
+  .handler(async ({ data: { query, excludeIds = [] } }) => {
+    const supabase = createClient();
+    const { data: profiles, error } = await supabase
+      .from("profiles")
+      .select("id, username, avatar_url")
+      .ilike("username", `%${query}%`)
+      .not("id", "in", `(${excludeIds.join(",")})`)
+      .limit(5);
+
+    if (error) {
+      console.error(`There was an error: ${error.message}`);
+      throw error;
+    }
+
+    return profiles;
+  });
+
 export const fetchUserTournamentsFn = createServerFn({ method: "GET" })
   .validator((d: string) => d)
   .handler(async ({ data: userId }) => {

@@ -20,7 +20,7 @@ interface TournamentListProps {
       profiles: Pick<Profile, "username">;
     }
   >;
-  user: User;
+  user: User | null;
 }
 
 export function TournamentList({ tournaments }: TournamentListProps) {

@@ -27,7 +27,7 @@ function RouteComponent() {
 
   if (!profile) return null;
 
-  const isOwnProfile = user?.id === profile.id;
+  const isOwnProfile = user?.data?.id === profile.id;
 
   return (
     <div className="container mx-auto space-y-8 py-8">

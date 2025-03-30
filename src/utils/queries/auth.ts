@@ -31,7 +31,7 @@ export const authQueryOptions = {
   signUp: (data: SignupSchemaValues) =>
     queryOptions({
       queryKey: ["auth", "signUp", data.email],
-      queryFn: async () => signupFn({ data }),
+      queryFn: () => signupFn({ data }),
     }),
   magicLink: (data: { email: string; redirectUrl?: string }) =>
     queryOptions({

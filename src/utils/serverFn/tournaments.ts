@@ -14,18 +14,25 @@ import { createServerFn } from "@tanstack/react-start";
 // NOTE: for temp function
 // import { faker } from "@snaplet/copycat";
 
+/**
+ * Custom error class for tournament-related errors
+ */
 class TournamentError extends Error {
-  constructor(
-    message: string,
-    public readonly code?: string,
-  ) {
+  code: string;
+  constructor(message: string, code: string) {
     super(message);
-    this.name = "TournamentError";
+    this.code = code;
   }
 }
 
-export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
-  async () => {
+/**
+ * Fetches tournament statistics including total tournaments, participant slots, and open tournaments
+ * @returns Tournament statistics
+ * @throws {TournamentError} If there's an error fetching the stats
+ */
+export const fetchTournamentStatsFn = createServerFn({ method: "GET" })
+  .validator(() => null)
+  .handler(async () => {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("tournaments")
@@ -47,17 +54,21 @@ export const fetchTournamentStatsFn = createServerFn({ method: "GET" }).handler(
       ),
       openTournaments: data.filter((t) => t.registration_open).length,
     };
-  },
-);
+  });
 
-export const fetchTournamentsFn = createServerFn({
-  method: "GET",
-}).handler(async () => {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("tournaments")
-    .select(
-      `
+/**
+ * Fetches a list of tournaments with basic information
+ * @returns Array of tournaments with basic details
+ * @throws {TournamentError} If there's an error fetching the tournaments
+ */
+export const fetchTournamentsFn = createServerFn({ method: "GET" })
+  .validator(() => null)
+  .handler(async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("tournaments")
+      .select(
+        `
         id,
         title,
         registration_open,
@@ -68,29 +79,34 @@ export const fetchTournamentsFn = createServerFn({
         updated_at,
         category
       `,
-    )
-    .limit(10)
-    .order("created_at", { ascending: false });
+      )
+      .limit(10)
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Supabase error: ", error);
-    throw new TournamentError(
-      "Unable to retrieve tournaments.",
-      "TOURNAMENT_FETCH_FAILED",
-    );
-  }
+    if (error) {
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to retrieve tournaments.",
+        "TOURNAMENT_FETCH_FAILED",
+      );
+    }
 
-  return data;
-});
+    return data;
+  });
 
-export const fetchTournamentsWithProfileFn = createServerFn({
-  method: "GET",
-}).handler(async () => {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("tournaments")
-    .select(
-      `
+/**
+ * Fetches a list of tournaments with creator profile information
+ * @returns Array of tournaments with creator profiles
+ * @throws {TournamentError} If there's an error fetching the tournaments
+ */
+export const fetchTournamentsWithProfileFn = createServerFn({ method: "GET" })
+  .validator(() => null)
+  .handler(async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("tournaments")
+      .select(
+        `
         id,
         title,
         registration_open,
@@ -101,33 +117,39 @@ export const fetchTournamentsWithProfileFn = createServerFn({
           username
         )
       `,
-    )
-    .limit(10)
-    .order("created_at", { ascending: false });
+      )
+      .limit(10)
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Supabase error: ", error);
-    throw new TournamentError(
-      "Unable to retrieve tournaments.",
-      "TOURNAMENT_FETCH_FAILED",
-    );
-  }
-
-  return data as Array<
-    Pick<
-      Tournament,
-      | "id"
-      | "title"
-      | "registration_open"
-      | "description"
-      | "max_participants"
-      | "created_at"
-    > & {
-      profiles: Pick<Profile, "id" | "username">;
+    if (error) {
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to retrieve tournaments.",
+        "TOURNAMENT_FETCH_FAILED",
+      );
     }
-  >;
-});
 
+    return data as Array<
+      Pick<
+        Tournament,
+        | "id"
+        | "title"
+        | "registration_open"
+        | "description"
+        | "max_participants"
+        | "created_at"
+      > & {
+        profiles: Pick<Profile, "id" | "username">;
+      }
+    >;
+  });
+
+/**
+ * Fetches detailed information about a specific tournament
+ * @param id Tournament ID
+ * @returns Detailed tournament information including participants, brackets, and moderators
+ * @throws {TournamentError} If there's an error fetching the tournament or if it's not found
+ */
 export const fetchTournamentFn = createServerFn({ method: "GET" })
   .validator((d: string) => d)
   .handler(async ({ data: id }) => {
@@ -195,7 +217,6 @@ export const fetchTournamentFn = createServerFn({ method: "GET" })
       );
     }
 
-    // Handle the case where no tournament is found.
     if (!tournamentData) {
       throw new TournamentError(
         "Tournament not found.",
@@ -272,25 +293,30 @@ export const addTournamentFn = createServerFn({ method: "POST" })
     };
   });
 
-export const fetchTournamentFormInfoFn = createServerFn({
-  method: "GET",
-}).handler(async () => {
-  const supabase = createClient();
-  const { data, error } = await supabase.from("tournaments").select(`
+/**
+ * Fetches tournament information for form population
+ * @returns Array of tournament titles and categories
+ * @throws {TournamentError} If there's an error fetching the tournament information
+ */
+export const fetchTournamentFormInfoFn = createServerFn({ method: "GET" })
+  .validator(() => null)
+  .handler(async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.from("tournaments").select(`
       title,
       category
     `);
 
-  if (error) {
-    console.error("Supabase error: ", error);
-    throw new TournamentError(
-      "Unable to retrieve tournament names.",
-      "TOURNAMENT_NAMES_FETCH_FAILED",
-    );
-  }
+    if (error) {
+      console.error("Supabase error: ", error);
+      throw new TournamentError(
+        "Unable to retrieve tournament names.",
+        "TOURNAMENT_NAMES_FETCH_FAILED",
+      );
+    }
 
-  return data;
-});
+    return data;
+  });
 
 // NOTE: temp function to manually bulk edit incorrect seeded data 😬
 // export const tempUpdateTournamentFn = createServerFn({

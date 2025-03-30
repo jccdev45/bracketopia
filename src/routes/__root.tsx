@@ -93,7 +93,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="flex min-h-svh flex-col">
-        <Navbar user={user as User | null} />
+        <Navbar user={user?.data ?? null} />
         {children}
         <Scripts />
       </body>

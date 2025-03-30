@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { TournamentWithDetails } from "@/types/tournament.types";
+import { participantsQueryOptions } from "@/utils/queries/participants";
 import { tournamentQueryOptions } from "@/utils/queries/tournaments";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import {
@@ -33,8 +33,12 @@ export const Route = createFileRoute("/_authed/tournaments/$id")({
 
 function RouteComponent() {
   const { id } = Route.useParams();
-  const { data } = useSuspenseQuery(tournamentQueryOptions.detail(id));
-  const tournament = data as TournamentWithDetails;
+  const { data: tournament } = useSuspenseQuery(
+    tournamentQueryOptions.detail(id),
+  );
+  const { data: participants = [] } = useQuery({
+    ...participantsQueryOptions.list(id),
+  });
 
   const formatName = (format: string) => {
     switch (format) {
@@ -117,8 +121,7 @@ function RouteComponent() {
                   <div className="space-y-0.5">
                     <p className="font-medium text-sm">Participants</p>
                     <p className="text-muted-foreground text-sm">
-                      {tournament.participants?.length || 0} /{" "}
-                      {tournament.max_participants}
+                      {participants.length}/{tournament.max_participants}
                     </p>
                   </div>
                 </div>
@@ -167,8 +170,8 @@ function RouteComponent() {
             <TabsContent value="participants" className="mt-4 h-full">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="font-semibold text-lg">
-                  {tournament.participants?.length || 0}/
-                  {tournament.max_participants} Participants
+                  {participants.length}/{tournament.max_participants}{" "}
+                  Participants
                 </h2>
                 <Badge
                   variant={
@@ -186,7 +189,10 @@ function RouteComponent() {
                       : "Invite Only"}
                 </Badge>
               </div>
-              <TournamentParticipants participants={tournament.participants} />
+              <TournamentParticipants
+                tournamentId={tournament.id}
+                participants={participants}
+              />
             </TabsContent>
             <TabsContent value="brackets" className="mt-4">
               <div className="mb-4 flex items-center justify-between">

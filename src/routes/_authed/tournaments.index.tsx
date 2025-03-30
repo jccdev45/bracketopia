@@ -2,7 +2,6 @@ import { TournamentList } from "@/components/tournament/list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tournamentQueryOptions } from "@/utils/queries/tournaments";
-import type { User } from "@supabase/supabase-js";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Plus, Trophy, Users } from "lucide-react";
@@ -90,7 +89,7 @@ function TournamentsIndex() {
         </div>
         <TournamentList
           tournaments={tournaments.slice(0, 5)}
-          user={user as User}
+          user={user?.data ?? null}
         />
       </div>
     </div>

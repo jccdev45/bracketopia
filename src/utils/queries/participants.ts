@@ -1,30 +1,25 @@
-import { createClient } from "@/integrations/supabase/client";
-import { queryOptions } from "@tanstack/react-query";
+import {
+  assignParticipantFn,
+  fetchParticipantsWithProfilesFn,
+} from "@/utils/serverFn/participants";
+import { type MutationOptions, queryOptions } from "@tanstack/react-query";
 
 export const participantsQueryOptions = {
   list: (tournamentId: string) =>
     queryOptions({
       queryKey: ["participants", tournamentId],
-      queryFn: async () => {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from("participants")
-          .select(`
-          id,
-          user_id,
-          profiles!inner(id, username)
-        `)
-          .eq("tournament_id", tournamentId);
-
-        if (error) throw error;
-
-        return data.map((participant) => ({
-          id: participant.id,
-          user_id: participant.user_id,
-          username: participant.profiles.username,
-        }));
-      },
+      queryFn: () => fetchParticipantsWithProfilesFn({ data: tournamentId }),
     }),
+};
+
+export const participantMutationOptions = {
+  assign: (): MutationOptions<
+    unknown,
+    Error,
+    { tournamentId: string; userId: string }
+  > => ({
+    mutationFn: (data) => assignParticipantFn({ data }),
+  }),
 };
 
 // interface Participant {

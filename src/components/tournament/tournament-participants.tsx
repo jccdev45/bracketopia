@@ -16,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ParticipantWithProfile } from "@/types/participant.types";
 import {
   type ColumnDef,
   flexRender,
@@ -27,29 +26,49 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
+import { AssignParticipant } from "./assign-participant";
+
+type ParticipantRow = {
+  id: string;
+  user_id: string;
+  tournament_id: string;
+  status: string;
+  seed: number | null;
+  created_at: string;
+  updated_at: string;
+  profiles: {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+  };
+};
 
 interface TournamentParticipantsProps {
-  participants?: ParticipantWithProfile[];
+  tournamentId: string;
+  participants: ParticipantRow[];
 }
 
 export function TournamentParticipants({
-  participants = [],
+  tournamentId,
+  participants,
 }: TournamentParticipantsProps) {
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns: ColumnDef<ParticipantWithProfile>[] = [
+  const columns: ColumnDef<ParticipantRow>[] = [
     {
-      accessorKey: "profiles.username",
+      id: "username",
+      accessorFn: (row) => row.profiles.username,
       header: "Name",
-      cell: (info) => info.getValue(),
     },
     {
-      accessorKey: "status",
+      id: "status",
+      accessorFn: (row) => row.status,
       header: "Status",
       cell: (info) => <Badge>{info.getValue() as string}</Badge>,
     },
     {
-      accessorKey: "seed",
+      id: "seed",
+      accessorFn: (row) => row.seed,
       header: "Seed",
       cell: (info) => info.getValue() || "N/A",
     },
@@ -70,12 +89,16 @@ export function TournamentParticipants({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
         <Input
           placeholder="Search..."
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
+        />
+        <AssignParticipant
+          tournamentId={tournamentId}
+          existingParticipantIds={participants.map((p) => p.user_id)}
         />
       </div>
       <div className="rounded-md border">
@@ -110,9 +133,12 @@ export function TournamentParticipants({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

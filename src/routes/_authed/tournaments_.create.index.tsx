@@ -97,7 +97,7 @@ function TournamentCreate() {
       await createTournamentMutation.mutateAsync({
         data: {
           ...value,
-          creator_id: user?.id as string,
+          creator_id: user?.data?.id as string,
         },
       });
     },
