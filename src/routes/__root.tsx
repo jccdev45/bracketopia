@@ -91,6 +91,29 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: <it's fine>
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                let isDark;
+                const stored = localStorage.getItem('vite-ui-theme');
+                
+                if (stored === 'dark') {
+                  isDark = true;
+                } else if (stored === 'light') {
+                  isDark = false;
+                } else {
+                  isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+                
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="flex min-h-svh flex-col">
         <Navbar user={user?.data ?? null} />

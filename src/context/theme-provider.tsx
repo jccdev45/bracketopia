@@ -28,13 +28,9 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useLocalStorage<Theme>(storageKey, defaultTheme);
-  // const [theme, setTheme] = useState<Theme>(
-  //   () => (storageValue as Theme) || defaultTheme,
-  // );
 
   useEffect(() => {
     const root = window.document.documentElement;
-
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
