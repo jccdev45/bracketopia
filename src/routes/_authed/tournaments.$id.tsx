@@ -24,7 +24,7 @@ import {
 
 export const Route = createFileRoute("/_authed/tournaments/$id")({
   component: RouteComponent,
-  beforeLoad: async ({ context, params: { id } }) => {
+  loader: async ({ context, params: { id } }) => {
     await context.queryClient.ensureQueryData(
       tournamentQueryOptions.detail(id),
     );

@@ -5,9 +5,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/context/theme-provider";
 import TanstackQueryLayout from "@/integrations/tanstack-query/layout";
 import appCss from "@/styles/styles.css?url";
+import type { AuthUserData } from "@/types/auth.types";
 import { seo } from "@/utils/config/seo";
 import { fetchUserFn } from "@/utils/serverFn/auth";
-import type { User } from "@supabase/supabase-js";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
@@ -21,7 +21,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 interface RouterContext {
   queryClient: QueryClient;
-  user?: User | null;
+  user?: AuthUserData | null;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -52,13 +52,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async ({ context }) => {
     await context.queryClient.invalidateQueries({ queryKey: ["user"] });
 
-    const user = await context.queryClient.fetchQuery({
+    const userResponse = await context.queryClient.fetchQuery({
       queryKey: ["user"],
       queryFn: ({ signal }) => fetchUserFn({ signal }),
       staleTime: 0,
     });
 
-    return { user };
+    return { user: userResponse.data };
   },
   errorComponent: (props) => {
     return (
@@ -116,7 +116,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body className="flex min-h-svh flex-col">
-        <Navbar user={user?.data ?? null} />
+        <Navbar user={user ?? null} />
         {children}
         <Scripts />
       </body>

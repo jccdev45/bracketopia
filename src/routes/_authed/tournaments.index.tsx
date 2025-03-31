@@ -89,7 +89,7 @@ function TournamentsIndex() {
         </div>
         <TournamentList
           tournaments={tournaments.slice(0, 5)}
-          user={user?.data ?? null}
+          user={user ?? null}
         />
       </div>
     </div>

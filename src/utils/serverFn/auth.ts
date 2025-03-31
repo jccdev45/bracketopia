@@ -35,7 +35,7 @@ const extractUserData = (user: User): AuthUserData => ({
  * @returns The user data if authenticated, null otherwise
  */
 export const fetchUserFn = createServerFn({ method: "GET" })
-  .validator(() => null)
+  // .validator(() => null)
   .handler(async (): Promise<AuthResponse<AuthUserData | null>> => {
     const supabase = createClient();
     const {
@@ -51,10 +51,16 @@ export const fetchUserFn = createServerFn({ method: "GET" })
       };
     }
 
+    const userData = extractUserData(user);
+
+    if (!userData.id) {
+      throw new Error("Invalid user data: Missing ID");
+    }
+
     return {
       error: false,
       message: "User found",
-      data: extractUserData(user),
+      data: userData,
     };
   });
 
