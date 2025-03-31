@@ -1,7 +1,16 @@
 import { createClient } from "@/integrations/supabase/server";
 import { createServerFn } from "@tanstack/react-start";
 
-// TODO: Add more functions and when finished, expand JSDoc
+/**
+ * Custom error class for participants-related errors
+ */
+class ParticipantsError extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.code = code;
+  }
+}
 
 export const fetchParticipantsWithProfilesFn = createServerFn({ method: "GET" })
   .validator((d: string) => d)
@@ -26,8 +35,11 @@ export const fetchParticipantsWithProfilesFn = createServerFn({ method: "GET" })
       .eq("tournament_id", tournamentId);
 
     if (error) {
-      console.error(`There was an error: ${error.message}`);
-      throw error;
+      console.error("❌ Supabase error: ", error);
+      throw new ParticipantsError(
+        "Unable to retrieve tournament participants.",
+        "TOURNAMENT_PARTICIPANTS_FETCH_FAILED",
+      );
     }
 
     return data;

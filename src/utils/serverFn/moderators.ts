@@ -1,7 +1,16 @@
 import { createClient } from "@/integrations/supabase/server";
 import { createServerFn } from "@tanstack/react-start";
 
-// TODO: Add more functions and when finished, expand JSDoc
+/**
+ * Custom error class for moderator-related errors
+ */
+class ModeratorError extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.code = code;
+  }
+}
 
 /**
  * Fetches tournament moderators, including their profiles, for a given tournament ID.
@@ -17,6 +26,8 @@ export const fetchModeratorsWithProfilesFn = createServerFn({ method: "GET" })
       .select(`
           id,
           user_id,
+          tournament_id,
+          created_at,
           profiles (
             id,
             username,
@@ -26,8 +37,11 @@ export const fetchModeratorsWithProfilesFn = createServerFn({ method: "GET" })
       .eq("tournament_id", tournamentId);
 
     if (error) {
-      console.error(`There was an error: ${error.message}`);
-      throw error;
+      console.error("❌ Supabase error: ", error);
+      throw new ModeratorError(
+        "Unable to retrieve tournament moderators.",
+        "TOURNAMENT_MODERATORS_FETCH_FAILED",
+      );
     }
 
     return moderatorsWithProfiles;

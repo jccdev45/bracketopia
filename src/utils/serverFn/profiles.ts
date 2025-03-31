@@ -1,6 +1,17 @@
 import { createClient } from "@/integrations/supabase/server";
 import { createServerFn } from "@tanstack/react-start";
 
+/**
+ * Custom error class for profile-related errors
+ */
+class ProfileError extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
 export const fetchProfileFn = createServerFn({ method: "GET" })
   .validator((d: string) => d)
   .handler(async ({ data: id }) => {
@@ -12,8 +23,11 @@ export const fetchProfileFn = createServerFn({ method: "GET" })
       .single();
 
     if (error) {
-      console.error(`There was an error: ${error.message}`);
-      throw error;
+      console.error("❌ Supabase error: ", error);
+      throw new ProfileError(
+        "Unable to retrieve tournament participants.",
+        "TOURNAMENT_PARTICIPANTS_FETCH_FAILED",
+      );
     }
 
     return profileData;
@@ -31,8 +45,11 @@ export const searchProfilesFn = createServerFn({ method: "GET" })
       .limit(5);
 
     if (error) {
-      console.error(`There was an error: ${error.message}`);
-      throw error;
+      console.error("❌ Supabase error: ", error);
+      throw new ProfileError(
+        "Unable to retrieve tournament participants.",
+        "TOURNAMENT_PARTICIPANTS_FETCH_FAILED",
+      );
     }
 
     return profiles;
@@ -50,7 +67,13 @@ export const fetchUserTournamentsFn = createServerFn({ method: "GET" })
       .eq("creator_id", userId)
       .order("created_at", { ascending: false });
 
-    if (createdError) throw createdError;
+    if (createdError) {
+      console.error("❌ Supabase error: ", createdError);
+      throw new ProfileError(
+        "Unable to retrieve tournament participants.",
+        "TOURNAMENT_PARTICIPANTS_FETCH_FAILED",
+      );
+    }
 
     // Fetch tournaments where user is a participant
     const { data: participations, error: participationsError } = await supabase
@@ -59,7 +82,13 @@ export const fetchUserTournamentsFn = createServerFn({ method: "GET" })
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    if (participationsError) throw participationsError;
+    if (participationsError) {
+      console.error("❌ Supabase error: ", participationsError);
+      throw new ProfileError(
+        "Unable to retrieve tournament participants.",
+        "TOURNAMENT_PARTICIPANTS_FETCH_FAILED",
+      );
+    }
 
     return {
       created: createdTournaments || [],
